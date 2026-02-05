@@ -1,4 +1,4 @@
-.PHONY: build up down clean clean-all logs ps restart lock sync
+.PHONY: build up down clean clean-all logs ps restart lock sync run test
 
 # Build and run commands
 build:
@@ -37,3 +37,7 @@ sync:
 
 run:
 	uv run uvicorn app.main:app --reload --port 9000
+
+# Run integration tests (API must be up; use uv)
+test:
+	uv run python -m pytest tests/ -v --tb=short
