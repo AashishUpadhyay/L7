@@ -44,9 +44,6 @@ jobs:
       - name: Create data directories
         run: make ci-dirs
 
-      - name: Build images
-        run: make build
-
       - name: Start test API and database
         run: make up-api-test
 

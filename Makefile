@@ -1,20 +1,20 @@
-.PHONY: build up down clean clean-all logs ps restart lock sync run test lint lint-fix build-up build-ui up-api up-api-test down-api-test wait-api test-docker test-docker-full ci-dirs
+.PHONY: build up down clean clean-all logs ps restart lock sync run test test-ui lint lint-fix build-up build-ui up-api up-api-test down-api-test wait-api test-docker test-docker-full ci-dirs
 
 # Lint (run before build; also used in CI)
 lint:
 	uv run ruff check app tests alembic
 	uv run ruff format --check app tests alembic
 
-# Build and run commands (lint first to fail fast on style/errors)
-build: lint
+# Build and run commands (lint and UI tests first to fail fast before creating containers)
+build: lint test-ui
 	docker compose build
 
 # Build images then start containers (use after code changes to pick up new API/tests)
 build-up: build
 	docker compose up -d
 
-# Build only the admin-panel (UI) container
-build-ui:
+# Build only the admin-panel (UI) container (UI tests run first)
+build-ui: test-ui
 	docker compose build admin-panel
 
 up:
@@ -85,6 +85,10 @@ run:
 # Run integration tests (API must be up; use uv)
 test:
 	uv run python -m pytest tests/ -v --tb=short
+
+# Run admin-panel UI tests (Vitest). Installs npm deps so 'make build' works without a prior npm install.
+test-ui:
+	cd admin-panel && npm ci && npm run test:run
 
 # Lint and auto-fix what ruff can fix
 lint-fix:

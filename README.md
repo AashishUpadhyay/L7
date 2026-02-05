@@ -2,11 +2,34 @@
 
 [![CI](https://github.com/AashishUpadhyay/L7/actions/workflows/ci.yml/badge.svg)](https://github.com/AashishUpadhyay/L7/actions/workflows/ci.yml)
 
-IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
+IMDB-style API and admin panel: Movies, Persons (actors), and their roles—with full CRUD, search, and integration tests.
 
 ---
 
-## Development setup
+## Overview
+
+This repository provides:
+
+- **Backend API** (FastAPI): REST API for **Movies** and **Persons** (people associated with movies). It supports **CRUD** and **search** on both resources, plus linking persons to movies with roles (e.g. cast, director).
+- **Admin panel** (React + TypeScript): Web UI to manage movies and persons—create, read, update, delete, and search—backed by the API.
+- **Database**: PostgreSQL with Alembic migrations; runs via Docker or a local Postgres instance.
+
+---
+
+## URLs (when services are running)
+
+| Service        | URL                          | Description                                      |
+| -------------- | ---------------------------- | ------------------------------------------------ |
+| **UI**         | http://localhost:3000        | Admin panel (Docker); movies & persons CRUD UI   |
+| **UI (dev)**   | http://localhost:5173        | Admin panel (Vite dev server)                     |
+| **API**        | http://localhost:9000        | REST API base URL                                |
+| **Swagger**    | http://localhost:9000/docs   | Interactive API docs (Swagger UI)                 |
+| **ReDoc**      | http://localhost:9000/redoc  | Alternative API documentation                    |
+| **OpenAPI**    | http://localhost:9000/openapi.json | Raw OpenAPI 3 schema                      |
+
+---
+
+## Development
 
 ### Docker (recommended)
 
@@ -25,7 +48,12 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    make up         # start imdb-db and imdb-api in background
    ```
 
-   The API waits for Postgres, runs Alembic migrations, then starts on **http://localhost:9000**.
+   To also run the **admin panel**:
+
+   ```bash
+   make build-ui   # build admin-panel image (optional, if not already built)
+   docker compose up -d imdb-db imdb-api admin-panel
+   ```
 
 2. **Useful commands**
 
@@ -38,9 +66,7 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
 
 3. **Run integration tests (in Docker)**
 
-   Tests use a **separate API and database** (`imdb-api-test`, `imdb-db-test`) so they never touch the main app data.
-
-   **Option A – one command (starts test stack, waits, then runs tests):**
+   **Option A – one command:**
 
    ```bash
    make test-docker-full
@@ -53,8 +79,6 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    make wait-api       # wait for test API health
    make test-docker    # run pytest in container
    ```
-
-   JUnit XML is written to `.appdata/integrationtests/junit.xml`.
 
    **Clean test DB:** To reset the test database (e.g. for a fresh run), remove the test volume and start again:
 
@@ -69,8 +93,6 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    - Test results: `.appdata/integrationtests/junit.xml`
 
 5. **After code changes**
-
-   Rebuild so the API container picks up changes:
 
    ```bash
    make build-up
@@ -90,8 +112,6 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    uv sync
    ```
 
-   Installs production and dev dependencies (including pytest, httpx).
-
 2. **Database**
 
    Either use Docker for Postgres only:
@@ -100,13 +120,11 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    docker compose up -d imdb-db
    ```
 
-   Then run migrations from the host:
-
    ```bash
    uv run alembic -c alembic.ini upgrade head
    ```
 
-   Or point to an existing Postgres with env vars: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (defaults in `app/db/config.py`).
+   Or use an existing Postgres via `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.
 
 3. **Run the API**
 
@@ -120,11 +138,20 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    uv run uvicorn app.main:app --reload --port 9000
    ```
 
-   API: **http://localhost:9000**. Docs: **http://localhost:9000/docs**.
+4. **Run the admin panel (optional)**
 
-4. **Run integration tests (local)**
+   From `admin-panel/`:
 
-   With the API running (Docker or local):
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+   Open **http://localhost:5173**. Set `VITE_API_BASE_URL` in `.env` to point to another API.
+
+5. **Run integration tests (local)**
+
+   With the API running:
 
    ```bash
    make test
@@ -136,36 +163,22 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    uv run python -m pytest tests/ -v --tb=short
    ```
 
-   Tests use `API_HOST=localhost` and `API_PORT=9000` by default (see `tests/conftest.py`).
-
-5. **Lockfile and deps**
+6. **Lockfile and deps**
 
    ```bash
    make lock   # uv lock
    make sync  # uv sync
    ```
 
-6. **Linting**
-
-   Linting runs in CI and must pass before integration tests. Locally:
+7. **Linting**
 
    ```bash
-   make lint      # Check only (fails on any issue)
-   make lint-fix  # Auto-fix with ruff (check --fix + format)
+   make lint      # Check only
+   make lint-fix  # Auto-fix with Ruff
    ```
-
-   Uses [Ruff](https://docs.astral.sh/ruff/) (configured in `pyproject.toml`).
 
 ---
 
 ## API documentation (Swagger)
 
-When the API is running, interactive OpenAPI docs are available:
-
-| URL                                    | Description                                                     |
-| -------------------------------------- | --------------------------------------------------------------- |
-| **http://localhost:9000/docs**         | Swagger UI – try out endpoints and see request/response schemas |
-| **http://localhost:9000/redoc**        | ReDoc – alternative documentation view                          |
-| **http://localhost:9000/openapi.json** | Raw OpenAPI 3 schema                                            |
-
-Tags in Swagger: **movies** (CRUD, bulk create, add persons), **persons** (CRUD, list). Request body examples are included for “Try it out”.
+When the API is running, interactive OpenAPI docs are available at the URLs in the table above. In Swagger (**/docs**): tags **movies** (CRUD, bulk create, add persons) and **persons** (CRUD, list). Request body examples are included for “Try it out”.
