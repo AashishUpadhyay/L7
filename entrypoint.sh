@@ -27,7 +27,10 @@ while True:
 PY
 
 echo "Running migrations..."
-cd /app && uv run alembic -c /app/alembic.ini upgrade head
+if ! (cd /app && uv run alembic -c /app/alembic.ini upgrade head); then
+    echo "Migration failed. Exiting."
+    exit 1
+fi
 
 echo "Starting API..."
 exec uv run uvicorn app.main:app --host 0.0.0.0 --port 9000

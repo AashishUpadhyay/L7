@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import datetime as dt
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, DateTime, Enum as SAEnum, Float, Integer, String, Text, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.db.models.genre import Genre
+
+if TYPE_CHECKING:
+    from app.db.models.movie_person import MoviePerson
 
 
 class Movie(Base):
@@ -26,4 +30,11 @@ class Movie(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+    movie_persons: Mapped[list[MoviePerson]] = relationship(
+        "MoviePerson",
+        back_populates="movie",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
