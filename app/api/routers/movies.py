@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.db.models.movie_person import MoviePerson
 from app.db.models.movies import Movie
+from app.db.models.person import Person
 from app.db.session import get_db
 from app.schemas.movie import (
     MovieBulkCreate,
@@ -11,6 +14,7 @@ from app.schemas.movie import (
     MovieResponse,
     MovieUpdate,
 )
+from app.schemas.movie_person import AddPersonToMovieRequest, MoviePersonResponse
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -20,6 +24,13 @@ def _get_movie(movie_id: int, db: Session) -> Movie:
     if movie is None:
         raise HTTPException(status_code=404, detail="Movie not found")
     return movie
+
+
+def _get_person(person_id: int, db: Session) -> Person:
+    person = db.get(Person, person_id)
+    if person is None:
+        raise HTTPException(status_code=404, detail="Person not found")
+    return person
 
 
 @router.get("", response_model=MovieListResponse)
@@ -103,3 +114,34 @@ def delete_movie(movie_id: int, db: Session = Depends(get_db)) -> None:
     movie = _get_movie(movie_id, db)
     db.delete(movie)
     db.commit()
+
+
+@router.post(
+    "/{movie_id}/persons",
+    response_model=MoviePersonResponse,
+    status_code=201,
+)
+def add_person_to_movie(
+    movie_id: int,
+    payload: AddPersonToMovieRequest,
+    db: Session = Depends(get_db),
+) -> MoviePerson:
+    """Add a person to a movie in a given role (Actor, Director, Producer)."""
+    _get_movie(movie_id, db)
+    _get_person(payload.person_id, db)
+    link = MoviePerson(
+        movie_id=movie_id,
+        person_id=payload.person_id,
+        role=payload.role,
+    )
+    db.add(link)
+    try:
+        db.commit()
+        db.refresh(link)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="This person is already assigned to this movie in this role.",
+        )
+    return link

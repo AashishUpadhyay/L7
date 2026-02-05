@@ -1,7 +1,14 @@
 """Integration tests for Movies API (run against live API in Docker)."""
 
+import uuid
+
 import pytest
 import httpx
+
+
+def _unique_email(prefix: str = "test") -> str:
+    """Return a unique email for tests to avoid duplicate-key errors across runs."""
+    return f"{prefix}-{uuid.uuid4().hex[:8]}@add-to-movie.test"
 
 
 class TestMoviesApi:
@@ -202,3 +209,129 @@ class TestMoviesApi:
             assert "id" in item
             assert "title" in item
             assert "genre" in item
+
+    def test_add_person_to_movie_returns_201_and_body(self, base_url: str) -> None:
+        """POST /movies/{id}/persons adds a person in a role and returns 201."""
+        with httpx.Client(timeout=10.0) as client:
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "Test Actor", "email": _unique_email("actor")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            movie_resp = client.post(
+                f"{base_url}/movies",
+                json={"title": "Movie With Cast", "genre": 1},
+            )
+            assert movie_resp.status_code == 201
+            movie_id = movie_resp.json()["id"]
+
+            response = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json={"person_id": person_id, "role": "Actor"},
+            )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["movie_id"] == movie_id
+        assert data["person_id"] == person_id
+        assert data["role"] == "Actor"
+        assert "id" in data
+
+    def test_add_person_to_movie_same_person_different_roles(
+        self, base_url: str
+    ) -> None:
+        """Same person can be added in different roles (Actor, Director)."""
+        with httpx.Client(timeout=10.0) as client:
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "Multi Role", "email": _unique_email("multirole")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            movie_resp = client.post(
+                f"{base_url}/movies",
+                json={"title": "Multi Role Movie", "genre": 2},
+            )
+            assert movie_resp.status_code == 201
+            movie_id = movie_resp.json()["id"]
+
+            r1 = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json={"person_id": person_id, "role": "Actor"},
+            )
+            r2 = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json={"person_id": person_id, "role": "Director"},
+            )
+
+        assert r1.status_code == 201
+        assert r2.status_code == 201
+        assert r1.json()["role"] == "Actor"
+        assert r2.json()["role"] == "Director"
+
+    def test_add_person_to_movie_movie_not_found_returns_404(
+        self, base_url: str
+    ) -> None:
+        """POST /movies/{id}/persons returns 404 when movie does not exist."""
+        with httpx.Client(timeout=10.0) as client:
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "Orphan", "email": _unique_email("orphan")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            response = client.post(
+                f"{base_url}/movies/999999/persons",
+                json={"person_id": person_id, "role": "Actor"},
+            )
+        assert response.status_code == 404
+
+    def test_add_person_to_movie_person_not_found_returns_404(
+        self, base_url: str
+    ) -> None:
+        """POST /movies/{id}/persons returns 404 when person does not exist."""
+        with httpx.Client(timeout=10.0) as client:
+            movie_resp = client.post(
+                f"{base_url}/movies",
+                json={"title": "No Cast Movie", "genre": 1},
+            )
+            assert movie_resp.status_code == 201
+            movie_id = movie_resp.json()["id"]
+
+            response = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json={"person_id": 999999, "role": "Actor"},
+            )
+        assert response.status_code == 404
+
+    def test_add_person_to_movie_duplicate_returns_409(self, base_url: str) -> None:
+        """Adding same person in same role again returns 409."""
+        with httpx.Client(timeout=10.0) as client:
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "Dup", "email": _unique_email("dup")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            movie_resp = client.post(
+                f"{base_url}/movies",
+                json={"title": "Dup Movie", "genre": 1},
+            )
+            assert movie_resp.status_code == 201
+            movie_id = movie_resp.json()["id"]
+
+            r1 = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json={"person_id": person_id, "role": "Producer"},
+            )
+            r2 = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json={"person_id": person_id, "role": "Producer"},
+            )
+        assert r1.status_code == 201
+        assert r2.status_code == 409
