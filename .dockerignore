@@ -1,0 +1,48 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Docker
+.docker/
+Dockerfile
+docker-compose.yml
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS specific
+.DS_Store
+
+# Data directories
+.appdata/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+.tmp/
+tmp/

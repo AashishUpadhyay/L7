@@ -1,0 +1,44 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.env/
+
+# uv
+.uv/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Type checking / linting
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Packaging / build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Local app data (docker volumes)
+.appdata/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Cursor
+.cursor/
+
