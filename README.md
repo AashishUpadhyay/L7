@@ -130,13 +130,14 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
 
 ---
 
-## CI (GitHub Actions)
+## API documentation (Swagger)
 
-On push and pull requests to `main` or `master`, the workflow:
+When the API is running, interactive OpenAPI docs are available:
 
-1. Builds all Docker images
-2. Starts the database and API
-3. Waits for the API health endpoint
-4. Runs the integration test container
+| URL                                    | Description                                                     |
+| -------------------------------------- | --------------------------------------------------------------- |
+| **http://localhost:9000/docs**         | Swagger UI – try out endpoints and see request/response schemas |
+| **http://localhost:9000/redoc**        | ReDoc – alternative documentation view                          |
+| **http://localhost:9000/openapi.json** | Raw OpenAPI 3 schema                                            |
 
-If the tests fail, the pipeline fails. The JUnit report is uploaded as an artifact (`junit-report`) for every run.
+Tags in Swagger: **movies** (CRUD, bulk create, add persons), **persons** (CRUD, list). Request body examples are included for “Try it out”.
