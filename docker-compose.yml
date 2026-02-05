@@ -12,10 +12,11 @@ services:
       - imdb-db
     environment:
       - DB_HOST=imdb-db
-      - DB_PORT=5432      
+      - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=imdb_db
+      - LOG_DIR=/app/data/logs
 
   imdb-db:
     image: postgres:14-alpine
@@ -28,14 +29,14 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=imdb_db
 
-  # imdb-integration-tests:
-  #   container_name: imdb-integration-tests
-  #   build:
-  #     dockerfile: tests/Dockerfile
-  #   volumes:
-  #     - .appdata/integrationtests:/app/data
-  #   depends_on:
-  #     - imdb-api
-  #   environment:
-  #     - API_HOST=imdb-api
-  #     - API_PORT=9000
+  imdb-integration-tests:
+    container_name: imdb-integration-tests
+    build:
+      dockerfile: tests/Dockerfile
+    volumes:
+      - .appdata/integrationtests:/app/data
+    depends_on:
+      - imdb-api
+    environment:
+      - API_HOST=imdb-api
+      - API_PORT=9000
