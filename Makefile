@@ -1,8 +1,12 @@
-.PHONY: build up down clean clean-all logs ps restart lock sync run test
+.PHONY: build up down clean clean-all logs ps restart lock sync run test build-up
 
 # Build and run commands
 build:
 	docker-compose build
+
+# Build images then start containers (use after code changes to pick up new API/tests)
+build-up: build
+	docker-compose up -d
 
 up:
 	docker-compose up -d
