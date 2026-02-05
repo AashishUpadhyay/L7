@@ -1,4 +1,4 @@
-.PHONY: build up down clean clean-all logs ps restart lock sync run test lint lint-fix build-up up-api wait-api test-docker ci-dirs
+.PHONY: build up down clean clean-all logs ps restart lock sync run test lint lint-fix build-up build-ui up-api up-api-test down-api-test wait-api test-docker test-docker-full ci-dirs
 
 # Lint (run before build; also used in CI)
 lint:
@@ -13,23 +13,39 @@ build: lint
 build-up: build
 	docker compose up -d
 
+# Build only the admin-panel (UI) container
+build-ui:
+	docker compose build admin-panel
+
 up:
 	docker compose up -d
 
-# Start only API and DB (for CI or when running tests in container)
+# Start only API and DB (for local dev / admin panel)
 up-api:
 	docker compose up -d imdb-db imdb-api
 
-# Wait for API health (for CI). Requires API to be starting.
+# Start test-only API and DB (for integration tests; isolated from main app)
+up-api-test:
+	docker compose up -d imdb-db-test imdb-api-test
+
+# Tear down test API and DB (used after integration tests; only run on success).
+down-api-test:
+	docker compose stop imdb-api-test imdb-db-test
+
+# Wait for API health (for CI). Uses test API on port 9001.
 wait-api:
 	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do \
-	  if curl -sf http://localhost:9000/health > /dev/null; then echo "API ready"; exit 0; fi; \
+	  if curl -sf http://localhost:9001/health > /dev/null; then echo "API ready"; exit 0; fi; \
 	  echo "Waiting for API... ($$i/30)"; sleep 2; \
 	done; echo "API did not become ready"; exit 1
 
-# Run integration tests in Docker (API must be up). Fails the build if tests fail.
+# Run integration tests in Docker (test API must be up: use 'make up-api-test' and 'make wait-api' first, or use 'make test-docker-full').
 test-docker:
 	docker compose run --rm imdb-integration-tests
+
+# Start test stack, wait for API, run integration tests, then tear down test API/DB on success.
+test-docker-full:
+	$(MAKE) up-api-test && $(MAKE) wait-api && $(MAKE) test-docker && $(MAKE) down-api-test
 
 # Create dirs for volume mounts (e.g. CI)
 ci-dirs:

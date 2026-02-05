@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import delete, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import exists, func
@@ -74,6 +74,9 @@ def search_movies(
 ) -> MovieListResponse:
     """Search movies with optional filters and paging. Genres and actor_ids use OR."""
     base = select(Movie)
+    if payload.title and payload.title.strip():
+        q = f"%{payload.title.strip()}%"
+        base = base.where(or_(Movie.title.ilike(q), Movie.description.ilike(q)))
     if payload.genres:
         base = (
             base.join(MovieGenre, MovieGenre.movie_id == Movie.id)

@@ -222,16 +222,17 @@ class TestPersonsApi:
 
     def test_search_persons_by_genre_returns_actors_in_that_genre(self, base_url: str) -> None:
         """POST /persons/search with genres (multiple) returns actors in movies of any of those genres."""
+        unique = uuid.uuid4().hex[:8]
         with httpx.Client(timeout=10.0) as client:
             a1 = client.post(
                 f"{base_url}/persons",
-                json={"name": "Drama Actor", "email": _unique_email("drama-actor")},
+                json={"name": f"Drama Actor {unique}", "email": _unique_email("drama-actor")},
             )
             assert a1.status_code == 201
             actor_id = a1.json()["id"]
             m = client.post(
                 f"{base_url}/movies",
-                json={"title": "Drama Movie", "genres": [3, 8]},  # Drama, Romance
+                json={"title": f"Drama Movie {unique}", "genres": [3, 8]},  # Drama, Romance
             )
             assert m.status_code == 201
             movie_id = m.json()["id"]
@@ -241,7 +242,7 @@ class TestPersonsApi:
             )
             response = client.post(
                 f"{base_url}/persons/search",
-                json={"genres": [3, 8], "skip": 0, "limit": 10},
+                json={"genres": [3, 8], "search": unique, "skip": 0, "limit": 10},
             )
         assert response.status_code == 200
         data = response.json()
@@ -251,87 +252,90 @@ class TestPersonsApi:
 
     def test_search_persons_by_multiple_movie_ids_or_returns_any_match(self, base_url: str) -> None:
         """POST /persons/search with movie_ids returns persons in any of those movies."""
+        unique = uuid.uuid4().hex[:8]
         with httpx.Client(timeout=10.0) as client:
             p1 = client.post(
                 f"{base_url}/persons",
-                json={"name": "In Movie A", "email": _unique_email("ma")},
+                json={"name": f"In Movie A {unique}", "email": _unique_email("ma")},
             )
             p2 = client.post(
                 f"{base_url}/persons",
-                json={"name": "In Movie B", "email": _unique_email("mb")},
+                json={"name": f"In Movie B {unique}", "email": _unique_email("mb")},
             )
             assert p1.status_code == 201
             assert p2.status_code == 201
+            pid1, pid2 = p1.json()["id"], p2.json()["id"]
             m1 = client.post(
                 f"{base_url}/movies",
-                json={"title": "Film A", "genres": [1]},
+                json={"title": f"Film A {unique}", "genres": [1]},
             )
             m2 = client.post(
                 f"{base_url}/movies",
-                json={"title": "Film B", "genres": [1]},
+                json={"title": f"Film B {unique}", "genres": [1]},
             )
             assert m1.status_code == 201
             assert m2.status_code == 201
             mid1, mid2 = m1.json()["id"], m2.json()["id"]
             client.post(
                 f"{base_url}/movies/{mid1}/persons",
-                json=[{"person_id": p1.json()["id"], "role": "Actor"}],
+                json=[{"person_id": pid1, "role": "Actor"}],
             )
             client.post(
                 f"{base_url}/movies/{mid2}/persons",
-                json=[{"person_id": p2.json()["id"], "role": "Actor"}],
+                json=[{"person_id": pid2, "role": "Actor"}],
             )
             response = client.post(
                 f"{base_url}/persons/search",
-                json={"movie_ids": [mid1, mid2], "skip": 0, "limit": 10},
+                json={"movie_ids": [mid1, mid2], "search": unique, "skip": 0, "limit": 10},
             )
         assert response.status_code == 200
         data = response.json()
         ids = [p["id"] for p in data["items"]]
-        assert p1.json()["id"] in ids
-        assert p2.json()["id"] in ids
+        assert pid1 in ids
+        assert pid2 in ids
 
     def test_search_persons_by_multiple_genres_or_returns_any_match(self, base_url: str) -> None:
         """POST /persons/search with genres returns persons in movies with any of those genres."""
+        unique = uuid.uuid4().hex[:8]
         with httpx.Client(timeout=10.0) as client:
             p1 = client.post(
                 f"{base_url}/persons",
-                json={"name": "SciFi Person", "email": _unique_email("sf")},
+                json={"name": f"SciFi Person {unique}", "email": _unique_email("sf")},
             )
             p2 = client.post(
                 f"{base_url}/persons",
-                json={"name": "Comedy Person", "email": _unique_email("cp")},
+                json={"name": f"Comedy Person {unique}", "email": _unique_email("cp")},
             )
             assert p1.status_code == 201
             assert p2.status_code == 201
+            pid1, pid2 = p1.json()["id"], p2.json()["id"]
             m1 = client.post(
                 f"{base_url}/movies",
-                json={"title": "SciFi Film", "genres": [5]},
+                json={"title": f"SciFi Film {unique}", "genres": [5]},
             )
             m2 = client.post(
                 f"{base_url}/movies",
-                json={"title": "Comedy Film", "genres": [2]},
+                json={"title": f"Comedy Film {unique}", "genres": [2]},
             )
             assert m1.status_code == 201
             assert m2.status_code == 201
-            mid1, mid2 = m1.json()["id"], m2.json()["id"]
             client.post(
-                f"{base_url}/movies/{mid1}/persons",
-                json=[{"person_id": p1.json()["id"], "role": "Actor"}],
+                f"{base_url}/movies/{m1.json()['id']}/persons",
+                json=[{"person_id": pid1, "role": "Actor"}],
             )
             client.post(
-                f"{base_url}/movies/{mid2}/persons",
-                json=[{"person_id": p2.json()["id"], "role": "Actor"}],
+                f"{base_url}/movies/{m2.json()['id']}/persons",
+                json=[{"person_id": pid2, "role": "Actor"}],
             )
             response = client.post(
                 f"{base_url}/persons/search",
-                json={"genres": [5, 2], "skip": 0, "limit": 10},
+                json={"genres": [5, 2], "search": unique, "skip": 0, "limit": 10},
             )
         assert response.status_code == 200
         data = response.json()
         ids = [p["id"] for p in data["items"]]
-        assert p1.json()["id"] in ids
-        assert p2.json()["id"] in ids
+        assert pid1 in ids
+        assert pid2 in ids
 
     def test_search_persons_paging_respected(self, base_url: str) -> None:
         """POST /persons/search with skip/limit returns correct page."""
@@ -375,3 +379,151 @@ class TestPersonsApi:
         assert len(r2.json()["items"]) <= 2
         assert r1.json()["skip"] == 0
         assert r2.json()["skip"] == 2
+
+    def test_search_persons_by_search_matches_name(self, base_url: str) -> None:
+        """POST /persons/search with search filters by substring match on name (case-insensitive)."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "UniqueNameAlice", "email": _unique_email("alice")},
+            )
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "UniqueNameBob", "email": _unique_email("bob")},
+            )
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "Other Person", "email": _unique_email("other")},
+            )
+            response = client.post(
+                f"{base_url}/persons/search",
+                json={"search": "UniqueName", "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        names = [p["name"] for p in data["items"]]
+        assert "UniqueNameAlice" in names
+        assert "UniqueNameBob" in names
+        assert "Other Person" not in names
+        assert data["total"] >= 2
+
+    def test_search_persons_by_search_matches_email(self, base_url: str) -> None:
+        """POST /persons/search with search filters by substring match on email (case-insensitive)."""
+        email1 = _unique_email("search-email")
+        email2 = _unique_email("search-email")
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "Person One", "email": email1},
+            )
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "Person Two", "email": email2},
+            )
+            # Search by a substring that appears in both emails (e.g. domain or prefix)
+            search_sub = "search-email"
+            response = client.post(
+                f"{base_url}/persons/search",
+                json={"search": search_sub, "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        emails = [p["email"] for p in data["items"]]
+        assert email1 in emails
+        assert email2 in emails
+        assert data["total"] >= 2
+
+    def test_search_persons_by_search_case_insensitive(self, base_url: str) -> None:
+        """POST /persons/search with search is case-insensitive."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "CaseSensitivePerson", "email": _unique_email("case")},
+            )
+            response = client.post(
+                f"{base_url}/persons/search",
+                json={"search": "casesensitive", "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] >= 1
+        assert any("CaseSensitivePerson" in (p.get("name") or "") for p in data["items"])
+
+    def test_search_persons_by_search_empty_ignored(self, base_url: str) -> None:
+        """POST /persons/search with empty or whitespace search does not filter by name/email."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/persons",
+                json={"name": "Someone", "email": _unique_email("someone")},
+            )
+            r1 = client.post(
+                f"{base_url}/persons/search",
+                json={"skip": 0, "limit": 100},
+            )
+            r2 = client.post(
+                f"{base_url}/persons/search",
+                json={"search": "", "skip": 0, "limit": 100},
+            )
+        assert r1.status_code == 200
+        assert r2.status_code == 200
+        assert r2.json()["total"] == r1.json()["total"]
+        assert r2.json()["total"] >= 1
+
+    def test_search_persons_by_search_with_paging(self, base_url: str) -> None:
+        """POST /persons/search with search and skip/limit returns correct page."""
+        with httpx.Client(timeout=10.0) as client:
+            for i in range(4):
+                client.post(
+                    f"{base_url}/persons",
+                    json={"name": f"SearchPerson {i}", "email": _unique_email(f"sp{i}")},
+                )
+            r1 = client.post(
+                f"{base_url}/persons/search",
+                json={"search": "SearchPerson", "skip": 0, "limit": 2},
+            )
+            r2 = client.post(
+                f"{base_url}/persons/search",
+                json={"search": "SearchPerson", "skip": 2, "limit": 2},
+            )
+        assert r1.status_code == 200
+        assert r2.status_code == 200
+        assert len(r1.json()["items"]) <= 2
+        assert len(r2.json()["items"]) <= 2
+        assert r1.json()["skip"] == 0
+        assert r2.json()["skip"] == 2
+        assert r1.json()["total"] == r2.json()["total"]
+        assert r1.json()["total"] >= 4
+
+    def test_search_persons_by_search_combined_with_movie_ids(self, base_url: str) -> None:
+        """POST /persons/search with search and movie_ids applies both filters."""
+        with httpx.Client(timeout=10.0) as client:
+            p1 = client.post(
+                f"{base_url}/persons",
+                json={"name": "SharedName In Movie", "email": _unique_email("sim1")},
+            )
+            p2 = client.post(
+                f"{base_url}/persons",
+                json={"name": "SharedName Other", "email": _unique_email("sim2")},
+            )
+            assert p1.status_code == 201
+            assert p2.status_code == 201
+            pid1, pid2 = p1.json()["id"], p2.json()["id"]
+            m = client.post(
+                f"{base_url}/movies",
+                json={"title": "One Film", "genres": [1]},
+            )
+            assert m.status_code == 201
+            movie_id = m.json()["id"]
+            client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json=[{"person_id": pid1, "role": "Actor"}],
+            )
+            response = client.post(
+                f"{base_url}/persons/search",
+                json={"search": "SharedName", "movie_ids": [movie_id], "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        ids = [p["id"] for p in data["items"]]
+        assert pid1 in ids
+        assert pid2 not in ids

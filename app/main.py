@@ -2,6 +2,7 @@ import logging
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routers import movies, persons
@@ -19,6 +20,14 @@ app = FastAPI(
         {"name": "movies", "description": "Movie CRUD, bulk create, and add persons to movies"},
         {"name": "persons", "description": "Person CRUD and list with paging"},
     ],
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(movies.router)

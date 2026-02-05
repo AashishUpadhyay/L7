@@ -41,6 +41,7 @@ class PersonListResponse(BaseModel):
 class PersonSearchRequest(BaseModel):
     """Search criteria for persons (any role: Actor, Director, Producer). All fields optional; omit for no filter."""
 
+    search: str | None = None  # Substring match on name or email (case-insensitive)
     movie_ids: list[int] | None = None  # OR: persons who participated in any of these movies
     genres: list[Genre] | None = (
         None  # OR: persons who participated in movies with any of these genres
