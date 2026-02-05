@@ -12,10 +12,11 @@ services:
       - imdb-db
     environment:
       - DB_HOST=imdb-db
-      - DB_PORT=5432      
+      - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=imdb_db
+      - LOG_DIR=/app/data/logs
 
   imdb-db:
     image: postgres:14-alpine
