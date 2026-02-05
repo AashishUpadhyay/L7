@@ -13,6 +13,9 @@ services:
     environment:
       - DB_HOST=imdb-db
       - DB_PORT=5432      
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=imdb_db
 
   imdb-db:
     image: postgres:14-alpine
