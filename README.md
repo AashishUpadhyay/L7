@@ -6,6 +6,24 @@ IMDB-style API and admin panel: Movies, Persons (actors), and their roles—with
 
 ---
 
+## Prerequisites
+
+Install these before building or running the project:
+
+| Tool | Purpose | Notes |
+|------|---------|--------|
+| **make** | Build and run commands | All instructions use the project `Makefile` (e.g. `make build`, `make test-ui`). Pre-installed on macOS/Linux; on Windows use WSL, Cygwin, or [GnuWin32 Make](http://gnuwin32.sourceforge.net/packages/make.htm). |
+| **[uv](https://docs.astral.sh/uv/)** | Python package manager and runner | Backend (API, lint, integration tests). Uses Python 3.11. |
+| **Docker** & **Docker Compose** | Containers for API, DB, admin panel, tests | Required for `make build`, `make build-up`, and integration tests in Docker. |
+| **Node.js** (v18+) & **npm** | Admin panel and UI tests | Required for `admin-panel/` (dev server, `make test-ui`). `make build` runs UI tests before building images. |
+
+- **make:** Usually pre-installed on macOS and Linux. On Windows, use [WSL](https://docs.microsoft.com/en-us/windows/wsl/), Cygwin, or install Make for Windows.
+- **Docker (recommended):** Install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
+- **Local backend:** `uv` will install Python; or use Python 3.11+ and then `uv sync`.
+- **Admin panel:** Install [Node.js](https://nodejs.org/) (LTS, e.g. 20.x); `npm` is included.
+
+---
+
 ## Overview
 
 This repository provides:
@@ -32,8 +50,6 @@ This repository provides:
 ## Development
 
 ### Docker (recommended)
-
-**Prerequisites:** Docker and Docker Compose.
 
 1. **Build and start the API and database**
 
@@ -103,8 +119,6 @@ This repository provides:
 ---
 
 ### Local (uv)
-
-**Prerequisites:** Python 3.11+ and [uv](https://docs.astral.sh/uv/).
 
 1. **Install dependencies**
 
