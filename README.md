@@ -125,3 +125,16 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    make lock   # uv lock
    make sync  # uv sync
    ```
+
+---
+
+## CI (GitHub Actions)
+
+On push and pull requests to `main` or `master`, the workflow:
+
+1. Builds all Docker images
+2. Starts the database and API
+3. Waits for the API health endpoint
+4. Runs the integration test container
+
+If the tests fail, the pipeline fails. The JUnit report is uploaded as an artifact (`junit-report`) for every run.

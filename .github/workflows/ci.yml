@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create data directories
+        run: make ci-dirs
+
+      - name: Build images
+        run: make build
+
+      - name: Start API and database
+        run: make up-api
+
+      - name: Wait for API
+        run: make wait-api
+
+      - name: Run integration tests
+        run: make test-docker
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          path: .appdata/integrationtests/junit.xml
