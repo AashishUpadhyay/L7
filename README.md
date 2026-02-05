@@ -1,5 +1,7 @@
 # IMDB API
 
+[![CI](https://github.com/AashishUpadhyay/L7/actions/workflows/ci.yml/badge.svg)](https://github.com/AashishUpadhyay/L7/actions/workflows/ci.yml)
+
 IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
 
 ---
