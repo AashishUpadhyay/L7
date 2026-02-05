@@ -29,6 +29,18 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=imdb_db
 
+  admin-panel:
+    container_name: admin-panel
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:9000
+    ports:
+      - "3000:80"
+    depends_on:
+      - imdb-api
+
   imdb-integration-tests:
     container_name: imdb-integration-tests
     build:
