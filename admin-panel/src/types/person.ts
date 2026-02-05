@@ -24,6 +24,7 @@ export interface PersonListResponse {
 }
 
 export interface PersonSearchRequest {
+  search?: string
   movie_ids?: number[]
   genres?: number[]
   skip?: number

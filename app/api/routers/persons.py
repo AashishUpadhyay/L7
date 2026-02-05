@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -48,11 +48,17 @@ def list_persons(
     return PersonListResponse(items=items, total=total, skip=skip, limit=limit)
 
 
+def _person_name_email_filter(q: str):
+    """Case-insensitive substring match on name or email."""
+    pattern = f"%{q}%"
+    return or_(Person.name.ilike(pattern), Person.email.ilike(pattern))
+
+
 @router.post(
     "/search",
     response_model=PersonListResponse,
     summary="Search persons",
-    description="Search persons by movie_ids (OR) or genres (OR) of movies they participated in. Request body supports optional filters and paging (skip, limit).",
+    description="Search persons by search (name/email), movie_ids (OR), or genres (OR). Request body supports optional filters and paging (skip, limit).",
     responses={
         200: {"description": "Paginated search results returned successfully."},
     },
@@ -62,6 +68,9 @@ def search_persons(
     db: Session = Depends(get_db),
 ) -> PersonListResponse:
     """Search persons with optional filters and paging (all roles). movie_ids and genres use OR."""
+    search_q = payload.search.strip() if payload.search else ""
+    name_filter = _person_name_email_filter(search_q) if search_q else None
+
     if payload.movie_ids or payload.genres:
         base = select(Person).join(MoviePerson, MoviePerson.person_id == Person.id)
         if payload.movie_ids:
@@ -73,6 +82,8 @@ def search_persons(
                 .where(MovieGenre.genre.in_(payload.genres))
                 .distinct()
             )
+        if name_filter is not None:
+            base = base.where(name_filter)
         total = db.execute(
             select(func.count()).select_from(base.distinct().subquery())
         ).scalar_one()
@@ -86,6 +97,8 @@ def search_persons(
                 .where(MovieGenre.genre.in_(payload.genres))
                 .distinct()
             )
+        if name_filter is not None:
+            ids_stmt = ids_stmt.where(name_filter)
         ids_stmt = ids_stmt.distinct().order_by(Person.id).offset(payload.skip).limit(payload.limit)
         ids = [row[0] for row in db.execute(ids_stmt).all()]
         if not ids:
@@ -97,6 +110,17 @@ def search_persons(
                 .all()
             )
         return PersonListResponse(items=items, total=total, skip=payload.skip, limit=payload.limit)
+
+    if name_filter is not None:
+        base = select(Person).where(name_filter)
+        total = db.execute(select(func.count()).select_from(base.subquery())).scalar_one()
+        items = (
+            db.execute(base.order_by(Person.id).offset(payload.skip).limit(payload.limit))
+            .scalars()
+            .all()
+        )
+        return PersonListResponse(items=items, total=total, skip=payload.skip, limit=payload.limit)
+
     total = db.query(Person).count()
     items = (
         db.execute(select(Person).offset(payload.skip).limit(payload.limit).order_by(Person.id))

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { listPersons, deletePerson } from '@/api/persons'
+import { listPersons, searchPersons, deletePerson } from '@/api/persons'
 import type { Person } from '@/types/person'
 import { ActorFormModal } from '@/components/actor/ActorFormModal'
 import { DeleteConfirmModal } from '@/components/common/DeleteConfirmModal'
@@ -35,16 +35,11 @@ export function ActorPage() {
     setLoading(true)
     setError(null)
     try {
-      const res = await listPersons(skip, limit)
-      let list = res.items
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase()
-        list = list.filter(
-          (p) =>
-            p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)
-        )
-      }
-      setItems(list)
+      const trimmed = searchQuery.trim()
+      const res = trimmed
+        ? await searchPersons({ search: trimmed, skip, limit })
+        : await listPersons(skip, limit)
+      setItems(res.items)
       setTotal(res.total)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load')
@@ -92,16 +87,10 @@ export function ActorPage() {
         >
           <span>+</span> ADD NEW
         </button>
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 border border-gray-200 text-sm transition-colors"
-        >
-          <span>↑</span> EXPORT <span className="text-gray-500">▼</span>
-        </button>
         <div className="flex items-center gap-2 flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search name"
+            placeholder="Search by name or email"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 max-w-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
@@ -162,10 +151,16 @@ export function ActorPage() {
                 >
                   <td className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300" /></td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <Link to={`/actor/${person.id}`} className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" title="View">👁</Link>
-                      <button type="button" onClick={() => setFormPerson(person)} className="p-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors" title="Edit">✎</button>
-                      <button type="button" onClick={() => setDeleteTarget(person)} className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors" title="Delete">✕</button>
+                    <div className="flex items-center gap-2">
+                      <Link to={`/actor/${person.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                      </Link>
+                      <button type="button" onClick={() => setFormPerson(person)} className="p-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors inline-flex items-center justify-center" title="Edit" aria-label="Edit">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                      </button>
+                      <button type="button" onClick={() => setDeleteTarget(person)} className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors inline-flex items-center justify-center" title="Delete" aria-label="Delete">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-gray-700">{person.id}</td>

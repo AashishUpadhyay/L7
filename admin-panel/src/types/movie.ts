@@ -33,6 +33,7 @@ export interface MovieListResponse {
 }
 
 export interface MovieSearchRequest {
+  title?: string
   genres?: number[]
   release_year?: number
   director_id?: number
