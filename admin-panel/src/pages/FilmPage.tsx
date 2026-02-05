@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { listMovies, searchMovies, deleteMovie } from '@/api/movies'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { GENRES } from '@/types/movie'
 import type { Movie } from '@/types/movie'
 import { FilmFormModal } from '@/components/film/FilmFormModal'
@@ -28,6 +29,7 @@ export function FilmPage() {
   const [limit, setLimit] = useState(10)
   const [loading, setLoading] = useState(true)
   const [searchTitle, setSearchTitle] = useState('')
+  const debouncedSearchTitle = useDebouncedValue(searchTitle, 400, () => setSkip(0))
   const [formMovie, setFormMovie] = useState<Movie | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Movie | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -36,7 +38,7 @@ export function FilmPage() {
     setLoading(true)
     setError(null)
     try {
-      const trimmed = searchTitle.trim()
+      const trimmed = debouncedSearchTitle.trim()
       const res = trimmed
         ? await searchMovies({ title: trimmed, skip, limit })
         : await listMovies(skip, limit)
@@ -49,7 +51,7 @@ export function FilmPage() {
     } finally {
       setLoading(false)
     }
-  }, [skip, limit, searchTitle])
+  }, [skip, limit, debouncedSearchTitle])
 
   useEffect(() => {
     fetchList()

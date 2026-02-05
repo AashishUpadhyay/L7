@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { listPersons, searchPersons, deletePerson } from '@/api/persons'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import type { Person } from '@/types/person'
 import { ActorFormModal } from '@/components/actor/ActorFormModal'
 import { DeleteConfirmModal } from '@/components/common/DeleteConfirmModal'
@@ -27,6 +28,7 @@ export function ActorPage() {
   const [limit, setLimit] = useState(10)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 400, () => setSkip(0))
   const [formPerson, setFormPerson] = useState<Person | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Person | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +37,7 @@ export function ActorPage() {
     setLoading(true)
     setError(null)
     try {
-      const trimmed = searchQuery.trim()
+      const trimmed = debouncedSearchQuery.trim()
       const res = trimmed
         ? await searchPersons({ search: trimmed, skip, limit })
         : await listPersons(skip, limit)
@@ -48,7 +50,7 @@ export function ActorPage() {
     } finally {
       setLoading(false)
     }
-  }, [skip, limit, searchQuery])
+  }, [skip, limit, debouncedSearchQuery])
 
   useEffect(() => {
     fetchList()

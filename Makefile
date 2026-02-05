@@ -1,4 +1,4 @@
-.PHONY: build up down clean clean-all logs ps restart lock sync run test lint lint-fix build-up up-api up-api-test wait-api test-docker test-docker-full ci-dirs
+.PHONY: build up down clean clean-all logs ps restart lock sync run test lint lint-fix build-up build-ui up-api up-api-test down-api-test wait-api test-docker test-docker-full ci-dirs
 
 # Lint (run before build; also used in CI)
 lint:
@@ -13,6 +13,10 @@ build: lint
 build-up: build
 	docker compose up -d
 
+# Build only the admin-panel (UI) container
+build-ui:
+	docker compose build admin-panel
+
 up:
 	docker compose up -d
 
@@ -23,6 +27,10 @@ up-api:
 # Start test-only API and DB (for integration tests; isolated from main app)
 up-api-test:
 	docker compose up -d imdb-db-test imdb-api-test
+
+# Tear down test API and DB (used after integration tests; only run on success).
+down-api-test:
+	docker compose stop imdb-api-test imdb-db-test
 
 # Wait for API health (for CI). Uses test API on port 9001.
 wait-api:
@@ -35,9 +43,9 @@ wait-api:
 test-docker:
 	docker compose run --rm imdb-integration-tests
 
-# Start test stack, wait for API, then run integration tests (all-in-one for CI or local).
+# Start test stack, wait for API, run integration tests, then tear down test API/DB on success.
 test-docker-full:
-	$(MAKE) up-api-test && $(MAKE) wait-api && $(MAKE) test-docker
+	$(MAKE) up-api-test && $(MAKE) wait-api && $(MAKE) test-docker && $(MAKE) down-api-test
 
 # Create dirs for volume mounts (e.g. CI)
 ci-dirs:
