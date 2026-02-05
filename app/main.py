@@ -10,7 +10,16 @@ from app.logging_config import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="IMDB API", version="0.1.0")
+app = FastAPI(
+    title="IMDB API",
+    version="0.1.0",
+    description="REST API for movies and persons with roles (Actor, Director, Producer). "
+    "Supports CRUD, bulk upload, and linking persons to movies.",
+    openapi_tags=[
+        {"name": "movies", "description": "Movie CRUD, bulk create, and add persons to movies"},
+        {"name": "persons", "description": "Person CRUD and list with paging"},
+    ],
+)
 
 app.include_router(movies.router)
 app.include_router(persons.router)
@@ -68,6 +77,7 @@ def on_startup() -> None:
     logger.info("IMDB API starting")
 
 
-@app.get("/health")
+@app.get("/health", tags=["health"])
 def health():
+    """Liveness check. Returns 200 when the API is up."""
     return {"status": "ok"}

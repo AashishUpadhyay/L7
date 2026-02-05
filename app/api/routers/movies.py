@@ -33,11 +33,19 @@ def _get_person(person_id: int, db: Session) -> Person:
     return person
 
 
-@router.get("", response_model=MovieListResponse)
+@router.get(
+    "",
+    response_model=MovieListResponse,
+    summary="List movies",
+    description="Returns a paginated list of all movies. Use `skip` and `limit` for paging.",
+    responses={
+        200: {"description": "Paginated list of movies returned successfully."},
+    },
+)
 def list_movies(
     db: Session = Depends(get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    skip: int = Query(0, ge=0, description="Number of records to skip (for paging)."),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of records to return (1–100)."),
 ) -> MovieListResponse:
     """List movies with paging."""
     total = db.query(Movie).count()
@@ -49,13 +57,31 @@ def list_movies(
     return MovieListResponse(items=items, total=total, skip=skip, limit=limit)
 
 
-@router.get("/{movie_id}", response_model=MovieResponse)
+@router.get(
+    "/{movie_id}",
+    response_model=MovieResponse,
+    summary="Get movie by ID",
+    description="Returns a single movie by its unique identifier.",
+    responses={
+        200: {"description": "Movie found and returned."},
+        404: {"description": "Movie not found."},
+    },
+)
 def get_movie(movie_id: int, db: Session = Depends(get_db)) -> Movie:
     """Get a single movie by id."""
     return _get_movie(movie_id, db)
 
 
-@router.post("", response_model=MovieResponse, status_code=201)
+@router.post(
+    "",
+    response_model=MovieResponse,
+    status_code=201,
+    summary="Create movie",
+    description="Creates a new movie with title, description, release date, genre, and optional rating.",
+    responses={
+        201: {"description": "Movie created successfully."},
+    },
+)
 def create_movie(payload: MovieCreate, db: Session = Depends(get_db)) -> Movie:
     movie = Movie(
         title=payload.title,
@@ -70,7 +96,16 @@ def create_movie(payload: MovieCreate, db: Session = Depends(get_db)) -> Movie:
     return movie
 
 
-@router.post("/bulk", response_model=list[MovieResponse], status_code=201)
+@router.post(
+    "/bulk",
+    response_model=list[MovieResponse],
+    status_code=201,
+    summary="Bulk create movies",
+    description="Creates multiple movies in a single request. Maximum 300 movies per request.",
+    responses={
+        201: {"description": "Movies created successfully."},
+    },
+)
 def bulk_create_movies(
     payload: MovieBulkCreate, db: Session = Depends(get_db)
 ) -> list[Movie]:
@@ -92,7 +127,16 @@ def bulk_create_movies(
     return created
 
 
-@router.patch("/{movie_id}", response_model=MovieResponse)
+@router.patch(
+    "/{movie_id}",
+    response_model=MovieResponse,
+    summary="Update movie",
+    description="Partially updates a movie. Only provided fields are updated.",
+    responses={
+        200: {"description": "Movie updated successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
 def update_movie(
     movie_id: int,
     payload: MovieUpdate,
@@ -108,7 +152,16 @@ def update_movie(
     return movie
 
 
-@router.delete("/{movie_id}", status_code=204)
+@router.delete(
+    "/{movie_id}",
+    status_code=204,
+    summary="Delete movie",
+    description="Deletes a movie by ID. Returns no content on success.",
+    responses={
+        204: {"description": "Movie deleted successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
 def delete_movie(movie_id: int, db: Session = Depends(get_db)) -> None:
     """Delete a movie."""
     movie = _get_movie(movie_id, db)
@@ -120,6 +173,13 @@ def delete_movie(movie_id: int, db: Session = Depends(get_db)) -> None:
     "/{movie_id}/persons",
     response_model=MoviePersonResponse,
     status_code=201,
+    summary="Add person to movie",
+    description="Associates a person with a movie in a given role (Actor, Director, or Producer). Each person can have only one role per movie.",
+    responses={
+        201: {"description": "Person added to movie successfully."},
+        404: {"description": "Movie or person not found."},
+        409: {"description": "This person is already assigned to this movie in this role."},
+    },
 )
 def add_person_to_movie(
     movie_id: int,
