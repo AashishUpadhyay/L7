@@ -1,17 +1,17 @@
 """init
 
 Revision ID: 0001_init
-Revises: 
+Revises:
+
 Create Date: 2026-02-05
 
 """
 
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
-
 
 revision = "0001_init"
 down_revision = None
@@ -60,9 +60,24 @@ def upgrade() -> None:
 
     # Use PostgreSQL ENUM that references existing type (no CREATE TYPE)
     genre_enum = postgresql.ENUM(
-        "Action", "Comedy", "Drama", "Horror", "SciFi", "Thriller", "Fantasy",
-        "Romance", "Animation", "Adventure", "Family", "Mystery", "War", "Western",
-        "Crime", "Documentary", "Biography", "History",
+        "Action",
+        "Comedy",
+        "Drama",
+        "Horror",
+        "SciFi",
+        "Thriller",
+        "Fantasy",
+        "Romance",
+        "Animation",
+        "Adventure",
+        "Family",
+        "Mystery",
+        "War",
+        "Western",
+        "Crime",
+        "Documentary",
+        "Biography",
+        "History",
         name="genre",
         create_type=False,
     )
@@ -98,4 +113,3 @@ def downgrade() -> None:
 
     op.drop_index("ix_persons_email", table_name="persons")
     op.drop_table("persons")
-

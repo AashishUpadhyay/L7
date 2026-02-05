@@ -42,9 +42,7 @@ def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse
 
 
 @app.exception_handler(RequestValidationError)
-def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
+def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Log validation errors (422) as ERROR. Override to WARNING/INFO/DEBUG if needed."""
     logger.error(
         "Validation error %s | body=%s",
@@ -78,6 +76,6 @@ def on_startup() -> None:
 
 
 @app.get("/health", tags=["health"])
-def health():
+def health() -> dict:
     """Liveness check. Returns 200 when the API is up."""
     return {"status": "ok"}

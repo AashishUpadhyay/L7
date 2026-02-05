@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum as SAEnum, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy import ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -28,9 +29,7 @@ class MoviePerson(Base):
     person_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False
     )
-    role: Mapped[MovieRole] = mapped_column(
-        SAEnum(MovieRole, name="movie_role"), nullable=False
-    )
+    role: Mapped[MovieRole] = mapped_column(SAEnum(MovieRole, name="movie_role"), nullable=False)
 
     # Relationships (optional, for convenient navigation)
     movie: Mapped["Movie"] = relationship("Movie", back_populates="movie_persons")

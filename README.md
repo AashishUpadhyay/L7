@@ -128,6 +128,17 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
    make sync  # uv sync
    ```
 
+6. **Linting**
+
+   Linting runs in CI and must pass before integration tests. Locally:
+
+   ```bash
+   make lint      # Check only (fails on any issue)
+   make lint-fix  # Auto-fix with ruff (check --fix + format)
+   ```
+
+   Uses [Ruff](https://docs.astral.sh/ruff/) (configured in `pyproject.toml`).
+
 ---
 
 ## API documentation (Swagger)

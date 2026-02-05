@@ -55,9 +55,7 @@ class MovieUpdate(BaseModel):
     rating: float | None = None
 
     model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [{"title": "Updated Title", "rating": 9.0}]
-        }
+        json_schema_extra={"examples": [{"title": "Updated Title", "rating": 9.0}]}
     )
 
 

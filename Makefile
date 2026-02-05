@@ -1,7 +1,12 @@
-.PHONY: build up down clean clean-all logs ps restart lock sync run test build-up up-api wait-api test-docker ci-dirs
+.PHONY: build up down clean clean-all logs ps restart lock sync run test lint lint-fix build-up up-api wait-api test-docker ci-dirs
 
-# Build and run commands
-build:
+# Lint (run before build; also used in CI)
+lint:
+	uv run ruff check app tests alembic
+	uv run ruff format --check app tests alembic
+
+# Build and run commands (lint first to fail fast on style/errors)
+build: lint
 	docker compose build
 
 # Build images then start containers (use after code changes to pick up new API/tests)
@@ -64,3 +69,8 @@ run:
 # Run integration tests (API must be up; use uv)
 test:
 	uv run python -m pytest tests/ -v --tb=short
+
+# Lint and auto-fix what ruff can fix
+lint-fix:
+	uv run ruff check app tests alembic --fix
+	uv run ruff format app tests alembic

@@ -8,4 +8,3 @@ def database_url() -> str:
     password = os.getenv("DB_PASSWORD", "postgres")
     name = os.getenv("DB_NAME", "postgres")
     return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
-
