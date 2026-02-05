@@ -47,10 +47,10 @@ jobs:
       - name: Build images
         run: make build
 
-      - name: Start API and database
-        run: make up-api
+      - name: Start test API and database
+        run: make up-api-test
 
-      - name: Wait for API
+      - name: Wait for test API
         run: make wait-api
 
       - name: Run integration tests

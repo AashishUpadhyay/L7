@@ -511,44 +511,48 @@ class TestMoviesApi:
 
     def test_search_movies_by_genre_finds_movies_with_multiple_genres(self, base_url: str) -> None:
         """POST /movies/search with genres returns movies that have any of those genres."""
+        unique = uuid.uuid4().hex[:8]
+        title = f"SciFi And Thriller {unique}"
         with httpx.Client(timeout=10.0) as client:
             client.post(
                 f"{base_url}/movies",
-                json={"title": "SciFi And Thriller", "genres": [5, 6]},
+                json={"title": title, "genres": [5, 6]},
             )
             response = client.post(
                 f"{base_url}/movies/search",
-                json={"genres": [5, 6], "skip": 0, "limit": 10},
+                json={"genres": [5, 6], "title": unique, "skip": 0, "limit": 10},
             )
         assert response.status_code == 200
         data = response.json()
-        assert any(m["title"] == "SciFi And Thriller" and 6 in m["genres"] for m in data["items"])
+        assert data["total"] >= 1
+        assert any(m["title"] == title and 6 in m["genres"] for m in data["items"])
 
     def test_search_movies_by_multiple_genres_or_returns_any_match(self, base_url: str) -> None:
         """POST /movies/search with genres (list) returns movies that have any of those genres."""
+        unique = uuid.uuid4().hex[:8]
         with httpx.Client(timeout=10.0) as client:
             client.post(
                 f"{base_url}/movies",
-                json={"title": "SciFi Only", "genres": [5]},
+                json={"title": f"SciFi Only {unique}", "genres": [5]},
             )
             client.post(
                 f"{base_url}/movies",
-                json={"title": "Comedy Only", "genres": [2]},
+                json={"title": f"Comedy Only {unique}", "genres": [2]},
             )
             client.post(
                 f"{base_url}/movies",
-                json={"title": "Drama Only", "genres": [3]},
+                json={"title": f"Drama Only {unique}", "genres": [3]},
             )
             response = client.post(
                 f"{base_url}/movies/search",
-                json={"genres": [5, 3], "skip": 0, "limit": 20},
+                json={"genres": [5, 3], "title": unique, "skip": 0, "limit": 20},
             )
         assert response.status_code == 200
         data = response.json()
         titles = [m["title"] for m in data["items"]]
-        assert "SciFi Only" in titles
-        assert "Drama Only" in titles
-        assert "Comedy Only" not in titles
+        assert f"SciFi Only {unique}" in titles
+        assert f"Drama Only {unique}" in titles
+        assert f"Comedy Only {unique}" not in titles
 
     def test_search_movies_by_release_year_returns_filtered_list(self, base_url: str) -> None:
         """POST /movies/search with release_year filters and returns paged results."""
@@ -714,3 +718,111 @@ class TestMoviesApi:
         assert r2.json()["skip"] == 2
         assert r1.json()["limit"] == 2
         assert r2.json()["limit"] == 2
+
+    def test_search_movies_by_title_returns_matching_movies(self, base_url: str) -> None:
+        """POST /movies/search with title filters by substring match on title (case-insensitive)."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={"title": "UniqueTitleAlpha", "genres": [1]},
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={"title": "UniqueTitleBeta", "genres": [2]},
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={"title": "Other Movie", "genres": [3]},
+            )
+            response = client.post(
+                f"{base_url}/movies/search",
+                json={"title": "UniqueTitle", "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        titles = [m["title"] for m in data["items"]]
+        assert "UniqueTitleAlpha" in titles
+        assert "UniqueTitleBeta" in titles
+        assert "Other Movie" not in titles
+        assert data["total"] >= 2
+
+    def test_search_movies_by_title_case_insensitive(self, base_url: str) -> None:
+        """POST /movies/search with title is case-insensitive."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={"title": "CaseSensitiveMovie", "genres": [1]},
+            )
+            response = client.post(
+                f"{base_url}/movies/search",
+                json={"title": "casesensitive", "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] >= 1
+        assert any("CaseSensitiveMovie" in (m["title"] or "") for m in data["items"])
+
+    def test_search_movies_by_title_matches_description(self, base_url: str) -> None:
+        """POST /movies/search with title also matches substring in description."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": "Plain Title",
+                    "description": "This movie has UniqueWordInDesc in the text.",
+                    "genres": [1],
+                },
+            )
+            response = client.post(
+                f"{base_url}/movies/search",
+                json={"title": "UniqueWordInDesc", "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] >= 1
+        assert any("UniqueWordInDesc" in (m.get("description") or "") for m in data["items"])
+
+    def test_search_movies_by_title_empty_ignored(self, base_url: str) -> None:
+        """POST /movies/search with empty or whitespace title does not filter by title."""
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={"title": "Some Movie", "genres": [1]},
+            )
+            r1 = client.post(
+                f"{base_url}/movies/search",
+                json={"skip": 0, "limit": 100},
+            )
+            r2 = client.post(
+                f"{base_url}/movies/search",
+                json={"title": "", "skip": 0, "limit": 100},
+            )
+        assert r1.status_code == 200
+        assert r2.status_code == 200
+        assert r2.json()["total"] == r1.json()["total"]
+        assert r2.json()["total"] >= 1
+
+    def test_search_movies_by_title_with_paging(self, base_url: str) -> None:
+        """POST /movies/search with title and skip/limit returns correct page."""
+        with httpx.Client(timeout=10.0) as client:
+            for i in range(4):
+                client.post(
+                    f"{base_url}/movies",
+                    json={"title": f"TitleSearch {i}", "genres": [1]},
+                )
+            r1 = client.post(
+                f"{base_url}/movies/search",
+                json={"title": "TitleSearch", "skip": 0, "limit": 2},
+            )
+            r2 = client.post(
+                f"{base_url}/movies/search",
+                json={"title": "TitleSearch", "skip": 2, "limit": 2},
+            )
+        assert r1.status_code == 200
+        assert r2.status_code == 200
+        assert len(r1.json()["items"]) <= 2
+        assert len(r2.json()["items"]) <= 2
+        assert r1.json()["skip"] == 0
+        assert r2.json()["skip"] == 2
+        assert r1.json()["total"] == r2.json()["total"]
+        assert r1.json()["total"] >= 4

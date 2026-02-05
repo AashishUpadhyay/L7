@@ -82,6 +82,7 @@ class MovieListResponse(BaseModel):
 class MovieSearchRequest(BaseModel):
     """Search criteria for movies. All fields optional; omit for no filter."""
 
+    title: str | None = None  # Substring match on title (case-insensitive)
     genres: list[Genre] | None = None  # OR: movies that have any of these genres
     director_id: int | None = None
     release_year: int | None = Field(None, ge=1800, le=2100)

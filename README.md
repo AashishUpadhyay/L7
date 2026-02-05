@@ -38,16 +38,33 @@ IMDB-style API: Movies, Persons, and roles with CRUD and integration tests.
 
 3. **Run integration tests (in Docker)**
 
-   With the API already up:
+   Tests use a **separate API and database** (`imdb-api-test`, `imdb-db-test`) so they never touch the main app data.
+
+   **Option A – one command (starts test stack, waits, then runs tests):**
 
    ```bash
-   docker compose run --rm imdb-integration-tests
+   make test-docker-full
    ```
 
-   This runs pytest in a container against the API and writes JUnit XML to `.appdata/integrationtests/junit.xml`.
+   **Option B – step by step:**
+
+   ```bash
+   make up-api-test    # start imdb-db-test and imdb-api-test (port 9001)
+   make wait-api       # wait for test API health
+   make test-docker    # run pytest in container
+   ```
+
+   JUnit XML is written to `.appdata/integrationtests/junit.xml`.
+
+   **Clean test DB:** To reset the test database (e.g. for a fresh run), remove the test volume and start again:
+
+   ```bash
+   docker compose down imdb-api-test imdb-integration-tests 2>/dev/null; docker volume rm imdb_postgres_test_data 2>/dev/null; make up-api-test && make wait-api && make test-docker
+   ```
 
 4. **Data and logs on the host**
-   - DB data: `.appdata/postgres/`
+   - Main DB data: `.appdata/postgres/`
+   - Test DB data: Docker volume `imdb_postgres_test_data` (separate from main)
    - API data (e.g. logs): `.appdata/app/` → logs at `.appdata/app/logs/app.log`
    - Test results: `.appdata/integrationtests/junit.xml`
 
