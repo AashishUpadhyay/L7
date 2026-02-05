@@ -1,14 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.db.models.movie_genre import MovieGenre
+from app.db.models.movie_person import MoviePerson
+from app.db.models.movies import Movie
 from app.db.models.person import Person
 from app.db.session import get_db
 from app.schemas.person import (
     PersonCreate,
     PersonListResponse,
     PersonResponse,
+    PersonSearchRequest,
     PersonUpdate,
 )
 
@@ -26,7 +30,7 @@ def _get_person(person_id: int, db: Session) -> Person:
     "",
     response_model=PersonListResponse,
     summary="List persons",
-    description="Returns a paginated list of all persons. Use `skip` and `limit` for paging.",
+    description="Returns a paginated list of all persons. Use `skip` and `limit` for paging. For search by movie_ids or genres (any role), use POST /persons/search.",
     responses={
         200: {"description": "Paginated list of persons returned successfully."},
     },
@@ -42,6 +46,64 @@ def list_persons(
     total = db.query(Person).count()
     items = db.execute(select(Person).offset(skip).limit(limit).order_by(Person.id)).scalars().all()
     return PersonListResponse(items=items, total=total, skip=skip, limit=limit)
+
+
+@router.post(
+    "/search",
+    response_model=PersonListResponse,
+    summary="Search persons",
+    description="Search persons by movie_ids (OR) or genres (OR) of movies they participated in. Request body supports optional filters and paging (skip, limit).",
+    responses={
+        200: {"description": "Paginated search results returned successfully."},
+    },
+)
+def search_persons(
+    payload: PersonSearchRequest,
+    db: Session = Depends(get_db),
+) -> PersonListResponse:
+    """Search persons with optional filters and paging (all roles). movie_ids and genres use OR."""
+    if payload.movie_ids or payload.genres:
+        base = select(Person).join(MoviePerson, MoviePerson.person_id == Person.id)
+        if payload.movie_ids:
+            base = base.where(MoviePerson.movie_id.in_(payload.movie_ids))
+        if payload.genres:
+            base = (
+                base.join(Movie, Movie.id == MoviePerson.movie_id)
+                .join(MovieGenre, MovieGenre.movie_id == Movie.id)
+                .where(MovieGenre.genre.in_(payload.genres))
+                .distinct()
+            )
+        total = db.execute(
+            select(func.count()).select_from(base.distinct().subquery())
+        ).scalar_one()
+        ids_stmt = select(Person.id).join(MoviePerson, MoviePerson.person_id == Person.id)
+        if payload.movie_ids:
+            ids_stmt = ids_stmt.where(MoviePerson.movie_id.in_(payload.movie_ids))
+        if payload.genres:
+            ids_stmt = (
+                ids_stmt.join(Movie, Movie.id == MoviePerson.movie_id)
+                .join(MovieGenre, MovieGenre.movie_id == Movie.id)
+                .where(MovieGenre.genre.in_(payload.genres))
+                .distinct()
+            )
+        ids_stmt = ids_stmt.distinct().order_by(Person.id).offset(payload.skip).limit(payload.limit)
+        ids = [row[0] for row in db.execute(ids_stmt).all()]
+        if not ids:
+            items = []
+        else:
+            items = (
+                db.execute(select(Person).where(Person.id.in_(ids)).order_by(Person.id))
+                .scalars()
+                .all()
+            )
+        return PersonListResponse(items=items, total=total, skip=payload.skip, limit=payload.limit)
+    total = db.query(Person).count()
+    items = (
+        db.execute(select(Person).offset(payload.skip).limit(payload.limit).order_by(Person.id))
+        .scalars()
+        .all()
+    )
+    return PersonListResponse(items=items, total=total, skip=payload.skip, limit=payload.limit)
 
 
 @router.get(

@@ -11,7 +11,7 @@ class MovieCreate(BaseModel):
     title: str
     description: str | None = None
     release_date: date | None = None
-    genre: Genre
+    genres: list[Genre] = Field(..., min_length=1, description="At least one genre required.")
     rating: float | None = None
 
     model_config = ConfigDict(
@@ -21,10 +21,10 @@ class MovieCreate(BaseModel):
                     "title": "Inception",
                     "description": "A thief who steals corporate secrets through dream-sharing.",
                     "release_date": "2010-07-16",
-                    "genre": 5,
+                    "genres": [5, 6],
                     "rating": 8.8,
                 },
-                {"title": "Minimal Movie", "genre": 2},
+                {"title": "Minimal Movie", "genres": [2]},
             ]
         }
     )
@@ -38,8 +38,8 @@ class MovieBulkCreate(BaseModel):
             "examples": [
                 {
                     "movies": [
-                        {"title": "Movie One", "genre": 1},
-                        {"title": "Movie Two", "genre": 2, "rating": 7.5},
+                        {"title": "Movie One", "genres": [1]},
+                        {"title": "Movie Two", "genres": [2], "rating": 7.5},
                     ]
                 }
             ]
@@ -51,7 +51,7 @@ class MovieUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     release_date: date | None = None
-    genre: Genre | None = None
+    genres: list[Genre] | None = Field(None, min_length=1)
     rating: float | None = None
 
     model_config = ConfigDict(
@@ -66,7 +66,7 @@ class MovieResponse(BaseModel):
     title: str
     description: str | None
     release_date: date | None
-    genre: Genre
+    genres: list[Genre]
     rating: float | None
     created_at: datetime
     updated_at: datetime
@@ -77,3 +77,14 @@ class MovieListResponse(BaseModel):
     total: int
     skip: int
     limit: int
+
+
+class MovieSearchRequest(BaseModel):
+    """Search criteria for movies. All fields optional; omit for no filter."""
+
+    genres: list[Genre] | None = None  # OR: movies that have any of these genres
+    director_id: int | None = None
+    release_year: int | None = Field(None, ge=1800, le=2100)
+    actor_ids: list[int] | None = None  # OR: movies that feature any of these actors
+    skip: int = Field(0, ge=0, description="Number of records to skip (for paging).")
+    limit: int = Field(20, ge=1, le=100, description="Maximum number of records to return (1–100).")

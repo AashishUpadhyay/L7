@@ -52,4 +52,5 @@ ignore = [
 "alembic/env.py" = ["I001", "B008"]
 "app/api/routers/*.py" = ["B008"]  # FastAPI Depends() in defaults is intentional
 "app/db/models/movie_person.py" = ["UP037"]  # forward refs for relationship types
+"app/db/models/movie_genre.py" = ["F821", "UP037"]  # forward ref for Movie (no import to avoid circular)
 "tests/*" = ["B011"]  # assert False ok in tests
