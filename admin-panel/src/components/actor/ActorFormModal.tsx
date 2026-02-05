@@ -46,8 +46,9 @@ export function ActorFormModal({ person, onClose, onSaved }: ActorFormModalProps
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First name</label>
+              <label htmlFor="actor-first-name" className="block text-sm font-medium text-gray-700 mb-1">First name</label>
               <input
+                id="actor-first-name"
                 type="text"
                 value={name.split(' ')[0] ?? ''}
                 onChange={(e) => {
@@ -59,8 +60,9 @@ export function ActorFormModal({ person, onClose, onSaved }: ActorFormModalProps
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+              <label htmlFor="actor-last-name" className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
               <input
+                id="actor-last-name"
                 type="text"
                 value={name.split(' ').slice(1).join(' ')}
                 onChange={(e) => {
@@ -71,8 +73,9 @@ export function ActorFormModal({ person, onClose, onSaved }: ActorFormModalProps
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label htmlFor="actor-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
+                id="actor-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

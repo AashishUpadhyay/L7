@@ -138,28 +138,24 @@ export function FilmPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-700 text-white">
-              <th className="w-10 px-4 py-3 text-left"><input type="checkbox" className="rounded border-gray-400" aria-label="Select all" /></th>
               <th className="px-4 py-3 text-left font-medium">Action</th>
-              <th className="px-4 py-3 text-left font-medium">Film id</th>
               <th className="px-4 py-3 text-left font-medium">Title</th>
               <th className="px-4 py-3 text-left font-medium">Description</th>
               <th className="px-4 py-3 text-left font-medium">Release date</th>
               <th className="px-4 py-3 text-left font-medium">Genres</th>
-              <th className="px-4 py-3 text-left font-medium">Last update</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
             ) : (
               items.map((movie, i) => (
                 <tr
                   key={movie.id}
                   className={`border-t border-gray-100 hover:bg-gray-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
                 >
-                  <td className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300" /></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Link to={`/film/${movie.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
@@ -173,12 +169,10 @@ export function FilmPage() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-700">{movie.id}</td>
                   <td className="px-4 py-3 font-medium">{movie.title}</td>
                   <td className="px-4 py-3 max-w-[200px] truncate text-gray-600" title={movie.description ?? ''}>{movie.description ?? '—'}</td>
                   <td className="px-4 py-3 text-gray-600">{formatDate(movie.release_date)}</td>
                   <td className="px-4 py-3 text-gray-600">{genreLabels(movie.genres)}</td>
-                  <td className="px-4 py-3 text-gray-600">{movie.updated_at ? new Date(movie.updated_at).toLocaleString() : '—'}</td>
                 </tr>
               ))
             )}

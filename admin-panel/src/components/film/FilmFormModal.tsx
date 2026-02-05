@@ -75,8 +75,9 @@ export function FilmFormModal({ movie, onClose, onSaved }: FilmFormModalProps) {
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <label htmlFor="film-title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
               <input
+                id="film-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -85,8 +86,9 @@ export function FilmFormModal({ movie, onClose, onSaved }: FilmFormModalProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label htmlFor="film-description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
               <textarea
+                id="film-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -94,8 +96,9 @@ export function FilmFormModal({ movie, onClose, onSaved }: FilmFormModalProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Release date</label>
+              <label htmlFor="film-release-date" className="block text-sm font-medium text-gray-700 mb-1">Release date</label>
               <input
+                id="film-release-date"
                 type="date"
                 value={releaseDate}
                 onChange={(e) => setReleaseDate(e.target.value)}
@@ -119,8 +122,9 @@ export function FilmFormModal({ movie, onClose, onSaved }: FilmFormModalProps) {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+              <label htmlFor="film-rating" className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
               <input
+                id="film-rating"
                 type="number"
                 step="0.1"
                 min="0"

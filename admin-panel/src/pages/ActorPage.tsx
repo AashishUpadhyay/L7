@@ -6,21 +6,6 @@ import type { Person } from '@/types/person'
 import { ActorFormModal } from '@/components/actor/ActorFormModal'
 import { DeleteConfirmModal } from '@/components/common/DeleteConfirmModal'
 
-function formatDate(s: string) {
-  try {
-    const d = new Date(s)
-    return d.toLocaleString('en-GB', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  } catch {
-    return s
-  }
-}
-
 export function ActorPage() {
   const [items, setItems] = useState<Person[]>([])
   const [total, setTotal] = useState(0)
@@ -129,29 +114,23 @@ export function ActorPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-700 text-white">
-              <th className="w-10 px-4 py-3 text-left">
-                <input type="checkbox" className="rounded border-gray-400" aria-label="Select all" />
-              </th>
               <th className="px-4 py-3 text-left font-medium">Action</th>
-              <th className="px-4 py-3 text-left font-medium">Actor id</th>
               <th className="px-4 py-3 text-left font-medium">First name</th>
               <th className="px-4 py-3 text-left font-medium">Last name</th>
-              <th className="px-4 py-3 text-left font-medium">Last update</th>
               <th className="px-4 py-3 text-left font-medium">Film</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
+              <tr><td colSpan={4} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
+              <tr><td colSpan={4} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
             ) : (
               items.map((person, i) => (
                 <tr
                   key={person.id}
                   className={`border-t border-gray-100 hover:bg-gray-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
                 >
-                  <td className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300" /></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Link to={`/actor/${person.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
@@ -165,10 +144,8 @@ export function ActorPage() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-700">{person.id}</td>
                   <td className="px-4 py-3">{person.name.split(' ')[0] ?? person.name}</td>
                   <td className="px-4 py-3">{person.name.split(' ').slice(1).join(' ') || '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{formatDate(person.updated_at)}</td>
                   <td className="px-4 py-3">
                     <Link to={`/actor/${person.id}`} className="text-blue-600 hover:text-blue-800 font-medium">Show &gt;</Link>
                   </td>
