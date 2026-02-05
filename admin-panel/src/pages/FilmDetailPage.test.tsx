@@ -3,10 +3,19 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { FilmDetailPage } from './FilmDetailPage'
 import * as moviesApi from '@/api/movies'
+import * as personsApi from '@/api/persons'
 
 vi.mock('@/api/movies', () => ({
   getMovie: vi.fn(),
   deleteMovie: vi.fn(),
+  getMoviePersons: vi.fn(),
+  addPersonsToMovie: vi.fn(),
+  removePersonFromMovie: vi.fn(),
+}))
+
+vi.mock('@/api/persons', () => ({
+  listPersons: vi.fn(),
+  createPerson: vi.fn(),
 }))
 
 const mockNavigate = vi.fn()
@@ -36,6 +45,7 @@ describe('FilmDetailPage', () => {
     release_date: '2010-07-16',
     genres: [3, 5],
     rating: 8.8,
+    image_path: null,
     created_at: '2010-01-01T00:00:00Z',
     updated_at: '2010-01-02T00:00:00Z',
   }
@@ -43,6 +53,13 @@ describe('FilmDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(moviesApi.getMovie).mockResolvedValue(movie)
+    vi.mocked(personsApi.listPersons).mockResolvedValue({
+      items: [],
+      total: 0,
+      skip: 0,
+      limit: 100,
+    })
+    vi.mocked(moviesApi.getMoviePersons).mockResolvedValue([])
   })
 
   it('shows loading then film details', async () => {

@@ -64,14 +64,8 @@ jobs:
       - name: Create data directories
         run: make ci-dirs
 
-      - name: Start test API and database
-        run: make up-api-test
-
-      - name: Wait for test API
-        run: make wait-api
-
-      - name: Run integration tests
-        run: make test-docker
+      - name: Run integration tests (full cycle)
+        run: make buildup-it
 
       - name: Upload JUnit report
         if: always()

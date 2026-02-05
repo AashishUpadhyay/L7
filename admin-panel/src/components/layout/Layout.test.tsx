@@ -19,8 +19,9 @@ describe('Layout', () => {
   it('renders header and sidebar', () => {
     renderLayout()
     expect(screen.getByRole('heading', { name: 'Admin Console' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Dashboard/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Film/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Actor/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Professional/i })).toBeInTheDocument()
   })
 
   it('renders outlet content', () => {

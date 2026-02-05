@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { getMovie, deleteMovie } from '@/api/movies'
+import { getImageUrl } from '@/utils/imageUrl'
 import { GENRES } from '@/types/movie'
 import type { Movie } from '@/types/movie'
 import { FilmFormModal } from '@/components/film/FilmFormModal'
@@ -83,6 +84,15 @@ export function FilmDetailPage() {
             </button>
           </div>
         </div>
+        {movie.image_path && (
+          <div className="mb-4">
+            <img
+              src={getImageUrl(movie.image_path) || ''}
+              alt={movie.title}
+              className="w-48 h-64 object-cover rounded border"
+            />
+          </div>
+        )}
         <dl className="grid grid-cols-[auto_1fr] gap-2 text-sm">
           <dt className="text-gray-600">Film id</dt>
           <dd>{movie.id}</dd>

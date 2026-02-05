@@ -8,6 +8,7 @@ vi.mock('@/api/persons', () => ({
   listPersons: vi.fn(),
   searchPersons: vi.fn(),
   deletePerson: vi.fn(),
+  getPersonMovies: vi.fn(),
 }))
 
 vi.mock('@/hooks/useDebouncedValue', () => ({
@@ -31,6 +32,7 @@ describe('ActorPage', () => {
         email: 'jane@example.com',
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-02T00:00:00Z',
+        movie_count: 2,
       },
     ],
     total: 1,
@@ -41,6 +43,7 @@ describe('ActorPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(personsApi.listPersons).mockResolvedValue(mockPersons)
+    vi.mocked(personsApi.getPersonMovies).mockResolvedValue([])
   })
 
   it('shows loading then table with actors', async () => {
@@ -59,7 +62,7 @@ describe('ActorPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Jane')).toBeInTheDocument()
     })
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/actor')
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/professionals')
     expect(screen.getByRole('button', { name: /ADD NEW/i })).toBeInTheDocument()
   })
 
@@ -113,7 +116,7 @@ describe('ActorPage', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Delete actor?' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Delete professional?' })).toBeInTheDocument()
       expect(screen.getByText(/Delete Jane Doe\?/)).toBeInTheDocument()
     })
   })
@@ -135,5 +138,93 @@ describe('ActorPage', () => {
       },
       { timeout: 1000 }
     )
+  })
+
+  it('renders Movies column with count', async () => {
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByText('Jane')).toBeInTheDocument()
+    })
+    expect(screen.getByRole('columnheader', { name: 'Movies' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '2 movies' })).toBeInTheDocument()
+  })
+
+  it('shows "0 movies" when person has no movies', async () => {
+    vi.mocked(personsApi.listPersons).mockResolvedValue({
+      items: [
+        {
+          id: 2,
+          name: 'John Smith',
+          email: 'john@example.com',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-02T00:00:00Z',
+          movie_count: 0,
+        },
+      ],
+      total: 1,
+      skip: 0,
+      limit: 10,
+    })
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByText('John')).toBeInTheDocument()
+    })
+    expect(screen.getByText('0 movies')).toBeInTheDocument()
+  })
+
+  it('opens movies modal when movie count is clicked', async () => {
+    vi.mocked(personsApi.getPersonMovies).mockResolvedValue([
+      { id: 1, movie_id: 1, movie_title: 'Inception', role: 'Actor' },
+      { id: 2, movie_id: 2, movie_title: 'Titanic', role: 'Director' },
+    ])
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '2 movies' })).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: '2 movies' }))
+
+    await waitFor(() => {
+      expect(personsApi.getPersonMovies).toHaveBeenCalledWith(1)
+    })
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Movies for Jane Doe' })).toBeInTheDocument()
+      expect(screen.getByText('Inception')).toBeInTheDocument()
+      expect(screen.getByText('Titanic')).toBeInTheDocument()
+      expect(screen.getByText('(Actor)')).toBeInTheDocument()
+      expect(screen.getByText('(Director)')).toBeInTheDocument()
+    })
+  })
+
+  it('shows Close button in movies modal', async () => {
+    vi.mocked(personsApi.getPersonMovies).mockResolvedValue([])
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '2 movies' })).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: '2 movies' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+    })
+  })
+
+  it('closes movies modal when Close is clicked', async () => {
+    vi.mocked(personsApi.getPersonMovies).mockResolvedValue([
+      { id: 1, movie_id: 1, movie_title: 'Inception', role: 'Actor' },
+    ])
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '2 movies' })).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: '2 movies' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Movies for Jane Doe' })).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: 'Movies for Jane Doe' })).not.toBeInTheDocument()
+    })
   })
 })

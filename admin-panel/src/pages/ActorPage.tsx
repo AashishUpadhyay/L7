@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { listPersons, searchPersons, deletePerson } from '@/api/persons'
+import { listPersons, searchPersons, deletePerson, getPersonMovies } from '@/api/persons'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import type { Person } from '@/types/person'
+import type { MovieInPerson, MovieRole } from '@/types/moviePerson'
 import { ActorFormModal } from '@/components/actor/ActorFormModal'
 import { DeleteConfirmModal } from '@/components/common/DeleteConfirmModal'
 
@@ -13,18 +14,28 @@ export function ActorPage() {
   const [limit, setLimit] = useState(10)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedRoles, setSelectedRoles] = useState<MovieRole[]>([])
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 400, () => setSkip(0))
   const [formPerson, setFormPerson] = useState<Person | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Person | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [movieModalPerson, setMovieModalPerson] = useState<Person | null>(null)
+  const [personMovies, setPersonMovies] = useState<MovieInPerson[]>([])
+  const [loadingMovies, setLoadingMovies] = useState(false)
 
   const fetchList = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
       const trimmed = debouncedSearchQuery.trim()
-      const res = trimmed
-        ? await searchPersons({ search: trimmed, skip, limit })
+      const hasFilters = trimmed || selectedRoles.length > 0
+      const res = hasFilters
+        ? await searchPersons({ 
+            search: trimmed || undefined, 
+            roles: selectedRoles.length > 0 ? selectedRoles : undefined,
+            skip, 
+            limit 
+          })
         : await listPersons(skip, limit)
       setItems(res.items)
       setTotal(res.total)
@@ -35,7 +46,7 @@ export function ActorPage() {
     } finally {
       setLoading(false)
     }
-  }, [skip, limit, debouncedSearchQuery])
+  }, [skip, limit, debouncedSearchQuery, selectedRoles])
 
   useEffect(() => {
     fetchList()
@@ -51,6 +62,28 @@ export function ActorPage() {
     }
   }
 
+  const handleShowMovies = async (person: Person) => {
+    setMovieModalPerson(person)
+    setLoadingMovies(true)
+    try {
+      const movies = await getPersonMovies(person.id)
+      setPersonMovies(movies)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load movies')
+    } finally {
+      setLoadingMovies(false)
+    }
+  }
+
+  const toggleRole = (role: MovieRole) => {
+    setSelectedRoles(prev => 
+      prev.includes(role) 
+        ? prev.filter(r => r !== role)
+        : [...prev, role]
+    )
+    setSkip(0)
+  }
+
   const currentPage = Math.floor(skip / limit) + 1
   const totalPages = Math.max(1, Math.ceil(total / limit))
   const from = total === 0 ? 0 : skip + 1
@@ -60,10 +93,41 @@ export function ActorPage() {
     <div className="max-w-6xl">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-xs text-gray-500 mb-5">
-        <Link to="/actor" className="hover:text-gray-700 transition-colors">Home</Link>
+        <Link to="/professionals" className="hover:text-gray-700 transition-colors">Home</Link>
         <span aria-hidden>/</span>
-        <span className="text-gray-800 font-medium">Actor</span>
+        <span className="text-gray-800 font-medium">Professionals</span>
       </nav>
+
+      {/* Role filters */}
+      <div className="flex items-center gap-3 mb-5">
+        <span className="text-sm font-medium text-gray-700">Filter by role:</span>
+        {(['Actor', 'Director', 'Producer'] as MovieRole[]).map((role) => (
+          <button
+            key={role}
+            type="button"
+            onClick={() => toggleRole(role)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              selectedRoles.includes(role)
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {role}
+          </button>
+        ))}
+        {selectedRoles.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedRoles([])
+              setSkip(0)
+            }}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
 
       {/* Action bar */}
       <div className="flex flex-wrap items-center gap-3 mb-5 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
@@ -117,14 +181,15 @@ export function ActorPage() {
               <th className="px-4 py-3 text-left font-medium">Action</th>
               <th className="px-4 py-3 text-left font-medium">First name</th>
               <th className="px-4 py-3 text-left font-medium">Last name</th>
-              <th className="px-4 py-3 text-left font-medium">Film</th>
+              <th className="px-4 py-3 text-left font-medium">Movies</th>
+              <th className="px-4 py-3 text-left font-medium">Details</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={4} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
             ) : (
               items.map((person, i) => (
                 <tr
@@ -133,7 +198,7 @@ export function ActorPage() {
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Link to={`/actor/${person.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
+                      <Link to={`/professionals/${person.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                       </Link>
                       <button type="button" onClick={() => setFormPerson(person)} className="p-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors inline-flex items-center justify-center" title="Edit" aria-label="Edit">
@@ -147,7 +212,20 @@ export function ActorPage() {
                   <td className="px-4 py-3">{person.name.split(' ')[0] ?? person.name}</td>
                   <td className="px-4 py-3">{person.name.split(' ').slice(1).join(' ') || '—'}</td>
                   <td className="px-4 py-3">
-                    <Link to={`/actor/${person.id}`} className="text-blue-600 hover:text-blue-800 font-medium">Show &gt;</Link>
+                    {person.movie_count != null && person.movie_count > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => handleShowMovies(person)}
+                        className="text-blue-600 hover:text-blue-800 font-medium underline"
+                      >
+                        {person.movie_count} {person.movie_count === 1 ? 'movie' : 'movies'}
+                      </button>
+                    ) : (
+                      <span className="text-gray-500">0 movies</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link to={`/professionals/${person.id}`} className="text-blue-600 hover:text-blue-800 font-medium">Show &gt;</Link>
                   </td>
                 </tr>
               ))
@@ -192,11 +270,57 @@ export function ActorPage() {
       )}
       {deleteTarget && (
         <DeleteConfirmModal
-          title="Delete actor?"
+          title="Delete professional?"
           message={`Delete ${deleteTarget.name}?`}
           onConfirm={() => handleDelete(deleteTarget)}
           onCancel={() => setDeleteTarget(null)}
         />
+      )}
+      
+      {movieModalPerson && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+            <h2 className="text-lg font-semibold mb-4">
+              Movies for {movieModalPerson.name}
+            </h2>
+            {loadingMovies ? (
+              <p className="text-gray-500 text-center py-4">Loading movies...</p>
+            ) : personMovies.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No movies found.</p>
+            ) : (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {personMovies.map((movie) => (
+                  <div
+                    key={`${movie.movie_id}-${movie.role}`}
+                    className="flex items-center justify-between bg-gray-50 px-4 py-3 rounded"
+                  >
+                    <div>
+                      <Link
+                        to={`/film/${movie.movie_id}`}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        {movie.movie_title}
+                      </Link>
+                      <span className="text-gray-500 text-sm ml-2">({movie.role})</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setMovieModalPerson(null)
+                  setPersonMovies([])
+                }}
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

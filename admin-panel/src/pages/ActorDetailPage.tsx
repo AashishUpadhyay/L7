@@ -38,7 +38,7 @@ export function ActorDetailPage() {
     try {
       await deletePerson(person.id)
       setDeleteConfirm(false)
-      navigate('/actor')
+      navigate('/professionals')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Delete failed')
     }
@@ -52,13 +52,13 @@ export function ActorDetailPage() {
       <nav className="flex items-center gap-2 text-sm text-gray-600 mb-4">
         <Link to="/" className="hover:text-gray-900">🏠 Home</Link>
         <span>/</span>
-        <Link to="/actor" className="hover:text-gray-900">Actor</Link>
+        <Link to="/professionals" className="hover:text-gray-900">Professionals</Link>
         <span>/</span>
         <span className="text-gray-900 font-medium">{person.name}</span>
       </nav>
       <div className="bg-white rounded shadow p-6 max-w-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold">Actor #{person.id}</h1>
+          <h1 className="text-xl font-semibold">Professional #{person.id}</h1>
           <div className="flex gap-2">
             <button
               type="button"
@@ -77,7 +77,7 @@ export function ActorDetailPage() {
           </div>
         </div>
         <dl className="grid grid-cols-[auto_1fr] gap-2 text-sm">
-          <dt className="text-gray-600">Actor id</dt>
+          <dt className="text-gray-600">Professional id</dt>
           <dd>{person.id}</dd>
           <dt className="text-gray-600">Name</dt>
           <dd>{person.name}</dd>
@@ -99,7 +99,7 @@ export function ActorDetailPage() {
       )}
       {deleteConfirm && (
         <DeleteConfirmModal
-          title="Delete actor?"
+          title="Delete professional?"
           message={`Delete ${person.name}?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteConfirm(false)}

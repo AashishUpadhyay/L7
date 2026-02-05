@@ -12,18 +12,21 @@ function renderWithRouter(initialEntries: string[] = ['/']) {
 }
 
 describe('Sidebar', () => {
-  it('renders Film and Actor nav links', () => {
+  it('renders navigation links', () => {
     renderWithRouter()
+    expect(screen.getByRole('link', { name: /Dashboard/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Film/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Actor/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Professional/i })).toBeInTheDocument()
   })
 
-  it('links to /film and /actor', () => {
+  it('links to correct routes', () => {
     renderWithRouter()
+    const dashboardLink = screen.getByRole('link', { name: /Dashboard/i })
     const filmLink = screen.getByRole('link', { name: /Film/i })
-    const actorLink = screen.getByRole('link', { name: /Actor/i })
+    const professionalsLink = screen.getByRole('link', { name: /Professional/i })
+    expect(dashboardLink).toHaveAttribute('href', '/')
     expect(filmLink).toHaveAttribute('href', '/film')
-    expect(actorLink).toHaveAttribute('href', '/actor')
+    expect(professionalsLink).toHaveAttribute('href', '/professionals')
   })
 
   it('shows active styling for current route', () => {

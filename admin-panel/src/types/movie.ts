@@ -1,3 +1,5 @@
+import { PersonInMovie } from './moviePerson'
+
 export interface Movie {
   id: number
   title: string
@@ -5,8 +7,10 @@ export interface Movie {
   release_date: string | null
   genres: number[]
   rating: number | null
+  image_path: string | null
   created_at: string
   updated_at: string
+  persons?: PersonInMovie[] // Optional field for expanded views
 }
 
 export interface MovieCreate {

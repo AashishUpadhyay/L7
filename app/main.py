@@ -1,11 +1,15 @@
 import logging
+import os
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-from app.api.routers import movies, persons
+from app.api.routers import admin, movies, persons
+from app.db.seed import run_seed
 from app.logging_config import setup_logging
 
 setup_logging()
@@ -19,6 +23,7 @@ app = FastAPI(
     openapi_tags=[
         {"name": "movies", "description": "Movie CRUD, bulk create, and add persons to movies"},
         {"name": "persons", "description": "Person CRUD and list with paging"},
+        {"name": "admin", "description": "Database admin: clean, seed, reset"},
     ],
 )
 
@@ -32,6 +37,12 @@ app.add_middleware(
 
 app.include_router(movies.router)
 app.include_router(persons.router)
+app.include_router(admin.router)
+
+# Mount static files for uploaded images
+uploads_dir = Path(os.getenv("STORAGE_LOCAL_PATH", "./uploads"))
+uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/static/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
 
 def _log_request(request: Request) -> str:
@@ -82,6 +93,14 @@ def unhandled_exception_handler(request: Request, exc: Exception) -> JSONRespons
 @app.on_event("startup")
 def on_startup() -> None:
     logger.info("IMDB API starting")
+    # Auto-seed database if empty
+    try:
+        if run_seed():
+            logger.info("Database auto-seeded from data.json")
+        else:
+            logger.info("Database already has data, skipping auto-seed")
+    except Exception as e:
+        logger.warning("Auto-seed failed: %s", e)
 
 
 @app.get("/health", tags=["health"])

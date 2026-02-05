@@ -6,6 +6,7 @@ import type {
   PersonListResponse,
   PersonSearchRequest,
 } from '@/types/person'
+import type { MovieInPerson } from '@/types/moviePerson'
 
 export function listPersons(skip = 0, limit = 10) {
   return request<PersonListResponse>('/persons', { params: { skip, limit } })
@@ -38,4 +39,8 @@ export function updatePerson(id: number, payload: PersonUpdate) {
 
 export function deletePerson(id: number) {
   return request<void>(`/persons/${id}`, { method: 'DELETE' })
+}
+
+export function getPersonMovies(personId: number) {
+  return request<MovieInPerson[]>(`/persons/${personId}/movies`)
 }
