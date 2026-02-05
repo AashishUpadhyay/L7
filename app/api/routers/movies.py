@@ -45,15 +45,13 @@ def _get_person(person_id: int, db: Session) -> Person:
 def list_movies(
     db: Session = Depends(get_db),
     skip: int = Query(0, ge=0, description="Number of records to skip (for paging)."),
-    limit: int = Query(20, ge=1, le=100, description="Maximum number of records to return (1–100)."),
+    limit: int = Query(
+        20, ge=1, le=100, description="Maximum number of records to return (1–100)."
+    ),
 ) -> MovieListResponse:
     """List movies with paging."""
     total = db.query(Movie).count()
-    items = (
-        db.execute(select(Movie).offset(skip).limit(limit).order_by(Movie.id))
-        .scalars()
-        .all()
-    )
+    items = db.execute(select(Movie).offset(skip).limit(limit).order_by(Movie.id)).scalars().all()
     return MovieListResponse(items=items, total=total, skip=skip, limit=limit)
 
 
@@ -106,9 +104,7 @@ def create_movie(payload: MovieCreate, db: Session = Depends(get_db)) -> Movie:
         201: {"description": "Movies created successfully."},
     },
 )
-def bulk_create_movies(
-    payload: MovieBulkCreate, db: Session = Depends(get_db)
-) -> list[Movie]:
+def bulk_create_movies(payload: MovieBulkCreate, db: Session = Depends(get_db)) -> list[Movie]:
     """Create multiple movies. Maximum 300 per request."""
     created: list[Movie] = []
     for m in payload.movies:
@@ -198,10 +194,10 @@ def add_person_to_movie(
     try:
         db.commit()
         db.refresh(link)
-    except IntegrityError:
+    except IntegrityError as e:
         db.rollback()
         raise HTTPException(
             status_code=409,
             detail="This person is already assigned to this movie in this role.",
-        )
+        ) from e
     return link

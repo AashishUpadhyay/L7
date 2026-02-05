@@ -2,8 +2,8 @@
 
 import uuid
 
-import pytest
 import httpx
+import pytest
 
 
 def _unique_email(prefix: str = "test") -> str:
@@ -12,22 +12,25 @@ def _unique_email(prefix: str = "test") -> str:
 
 
 class TestMoviesApi:
-    @pytest.mark.parametrize("payload,expected_genre_value", [
-        (
-            {
-                "title": "Inception",
-                "description": "A thief who steals corporate secrets through dream-sharing technology.",
-                "release_date": "2010-07-16",
-                "genre": 5,  # SciFi
-                "rating": 8.8,
-            },
-            5,
-        ),
-        (
-            {"title": "Minimal Movie", "genre": 2},  # Comedy
-            2,
-        ),
-    ])
+    @pytest.mark.parametrize(
+        "payload,expected_genre_value",
+        [
+            (
+                {
+                    "title": "Inception",
+                    "description": "A thief who steals corporate secrets through dream-sharing technology.",
+                    "release_date": "2010-07-16",
+                    "genre": 5,  # SciFi
+                    "rating": 8.8,
+                },
+                5,
+            ),
+            (
+                {"title": "Minimal Movie", "genre": 2},  # Comedy
+                2,
+            ),
+        ],
+    )
     def test_create_movie_returns_201_and_body(
         self, base_url: str, payload: dict, expected_genre_value: int
     ) -> None:
@@ -172,9 +175,7 @@ class TestMoviesApi:
 
     def test_bulk_upload_over_limit_returns_422(self, base_url: str) -> None:
         """POST /movies/bulk with more than 300 movies returns 422."""
-        payload = {
-            "movies": [{"title": f"Movie {i}", "genre": 1} for i in range(301)]
-        }
+        payload = {"movies": [{"title": f"Movie {i}", "genre": 1} for i in range(301)]}
         with httpx.Client(timeout=10.0) as client:
             response = client.post(f"{base_url}/movies/bulk", json=payload)
 
@@ -239,9 +240,7 @@ class TestMoviesApi:
         assert data["role"] == "Actor"
         assert "id" in data
 
-    def test_add_person_to_movie_same_person_different_roles(
-        self, base_url: str
-    ) -> None:
+    def test_add_person_to_movie_same_person_different_roles(self, base_url: str) -> None:
         """Same person can be added in different roles (Actor, Director)."""
         with httpx.Client(timeout=10.0) as client:
             person_resp = client.post(
@@ -272,9 +271,7 @@ class TestMoviesApi:
         assert r1.json()["role"] == "Actor"
         assert r2.json()["role"] == "Director"
 
-    def test_add_person_to_movie_movie_not_found_returns_404(
-        self, base_url: str
-    ) -> None:
+    def test_add_person_to_movie_movie_not_found_returns_404(self, base_url: str) -> None:
         """POST /movies/{id}/persons returns 404 when movie does not exist."""
         with httpx.Client(timeout=10.0) as client:
             person_resp = client.post(
@@ -290,9 +287,7 @@ class TestMoviesApi:
             )
         assert response.status_code == 404
 
-    def test_add_person_to_movie_person_not_found_returns_404(
-        self, base_url: str
-    ) -> None:
+    def test_add_person_to_movie_person_not_found_returns_404(self, base_url: str) -> None:
         """POST /movies/{id}/persons returns 404 when person does not exist."""
         with httpx.Client(timeout=10.0) as client:
             movie_resp = client.post(

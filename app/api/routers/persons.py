@@ -34,15 +34,13 @@ def _get_person(person_id: int, db: Session) -> Person:
 def list_persons(
     db: Session = Depends(get_db),
     skip: int = Query(0, ge=0, description="Number of records to skip (for paging)."),
-    limit: int = Query(20, ge=1, le=100, description="Maximum number of records to return (1–100)."),
+    limit: int = Query(
+        20, ge=1, le=100, description="Maximum number of records to return (1–100)."
+    ),
 ) -> PersonListResponse:
     """List persons with paging."""
     total = db.query(Person).count()
-    items = (
-        db.execute(select(Person).offset(skip).limit(limit).order_by(Person.id))
-        .scalars()
-        .all()
-    )
+    items = db.execute(select(Person).offset(skip).limit(limit).order_by(Person.id)).scalars().all()
     return PersonListResponse(items=items, total=total, skip=skip, limit=limit)
 
 
@@ -78,12 +76,12 @@ def create_person(payload: PersonCreate, db: Session = Depends(get_db)) -> Perso
     try:
         db.commit()
         db.refresh(person)
-    except IntegrityError:
+    except IntegrityError as e:
         db.rollback()
         raise HTTPException(
             status_code=409,
             detail="A person with this email already exists.",
-        )
+        ) from e
     return person
 
 

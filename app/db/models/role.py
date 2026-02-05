@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class MovieRole(str, Enum):
+class MovieRole(StrEnum):
     """Role of a person in a movie."""
 
     Actor = "Actor"

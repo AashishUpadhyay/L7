@@ -8,9 +8,7 @@ class PersonCreate(BaseModel):
     email: str
 
     model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [{"name": "Jane Doe", "email": "jane.doe@example.com"}]
-        }
+        json_schema_extra={"examples": [{"name": "Jane Doe", "email": "jane.doe@example.com"}]}
     )
 
 
@@ -18,9 +16,7 @@ class PersonUpdate(BaseModel):
     name: str | None = None
     email: str | None = None
 
-    model_config = ConfigDict(
-        json_schema_extra={"examples": [{"name": "Updated Name"}]}
-    )
+    model_config = ConfigDict(json_schema_extra={"examples": [{"name": "Updated Name"}]})
 
 
 class PersonResponse(BaseModel):

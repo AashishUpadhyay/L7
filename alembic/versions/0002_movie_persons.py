@@ -8,10 +8,9 @@ Create Date: 2026-02-05
 
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
-
 
 revision = "0002_movie_persons"
 down_revision = "0001_init"
@@ -33,7 +32,9 @@ def upgrade() -> None:
     )
 
     movie_role_enum = postgresql.ENUM(
-        "Actor", "Director", "Producer",
+        "Actor",
+        "Director",
+        "Producer",
         name="movie_role",
         create_type=False,
     )
