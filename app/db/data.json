@@ -1,0 +1,1053 @@
+[
+  {
+    "Title": "The Silent Horizon",
+    "Description": "A space explorer uncovers a signal that could change humanity forever.",
+    "ReleaseDate": "2018-03-16",
+    "Genre": "Science Fiction",
+    "Actor": "Matthew McConaughey",
+    "Director": "Denis Villeneuve",
+    "Producer": "Emma Thomas"
+  },
+  {
+    "Title": "City of Shadows",
+    "Description": "A detective navigates corruption and crime in a decaying metropolis.",
+    "ReleaseDate": "2017-11-10",
+    "Genre": "Crime Thriller",
+    "Actor": "Jake Gyllenhaal",
+    "Director": "David Fincher",
+    "Producer": "Ceán Chaffin"
+  },
+  {
+    "Title": "Whispers in the Wind",
+    "Description": "A rural family confronts long-buried secrets after a tragic loss.",
+    "ReleaseDate": "2019-06-21",
+    "Genre": "Drama",
+    "Actor": "Frances McDormand",
+    "Director": "Chloé Zhao",
+    "Producer": "Joshua James Richards"
+  },
+  {
+    "Title": "Neon Pulse",
+    "Description": "A hacker races against time to stop a digital apocalypse.",
+    "ReleaseDate": "2020-08-14",
+    "Genre": "Action",
+    "Actor": "Keanu Reeves",
+    "Director": "Lana Wachowski",
+    "Producer": "Grant Hill"
+  },
+  {
+    "Title": "The Last Kingdom Fall",
+    "Description": "An exiled prince fights to reclaim his throne.",
+    "ReleaseDate": "2016-12-02",
+    "Genre": "Fantasy",
+    "Actor": "Henry Cavill",
+    "Director": "Ridley Scott",
+    "Producer": "Kevin J. Walsh"
+  },
+  {
+    "Title": "Echo Lake",
+    "Description": "Two strangers form an unlikely bond after a natural disaster.",
+    "ReleaseDate": "2018-09-07",
+    "Genre": "Romance",
+    "Actor": "Ryan Gosling",
+    "Director": "Damien Chazelle",
+    "Producer": "Marc Platt"
+  },
+  {
+    "Title": "Iron Resolve",
+    "Description": "A soldier battles inner demons after returning from war.",
+    "ReleaseDate": "2015-05-22",
+    "Genre": "War Drama",
+    "Actor": "Brad Pitt",
+    "Director": "Kathryn Bigelow",
+    "Producer": "Megan Ellison"
+  },
+  {
+    "Title": "Midnight Expressway",
+    "Description": "A cab driver becomes entangled in a dangerous conspiracy.",
+    "ReleaseDate": "2019-01-18",
+    "Genre": "Thriller",
+    "Actor": "Oscar Isaac",
+    "Director": "Nicolas Winding Refn",
+    "Producer": "Adam Siegel"
+  },
+  {
+    "Title": "Golden Strings",
+    "Description": "A prodigy violinist struggles with fame and family pressure.",
+    "ReleaseDate": "2021-04-09",
+    "Genre": "Music Drama",
+    "Actor": "Natalie Portman",
+    "Director": "Darren Aronofsky",
+    "Producer": "Scott Franklin"
+  },
+  {
+    "Title": "Frozen Ashes",
+    "Description": "Scientists investigate a mysterious phenomenon in Antarctica.",
+    "ReleaseDate": "2022-02-11",
+    "Genre": "Mystery",
+    "Actor": "Benedict Cumberbatch",
+    "Director": "Alex Garland",
+    "Producer": "Andrew Macdonald"
+  },
+
+  {
+    "Title": "The Painted Sky",
+    "Description": "A young artist chases her dreams in a harsh city.",
+    "ReleaseDate": "2016-07-29",
+    "Genre": "Drama",
+    "Actor": "Saoirse Ronan",
+    "Director": "Greta Gerwig",
+    "Producer": "Eli Bush"
+  },
+  {
+    "Title": "Rogue Frequency",
+    "Description": "A radio host uncovers a series of coded murder confessions.",
+    "ReleaseDate": "2017-10-27",
+    "Genre": "Psychological Thriller",
+    "Actor": "Paul Dano",
+    "Director": "Ari Aster",
+    "Producer": "Lars Knudsen"
+  },
+  {
+    "Title": "Steel Harbor",
+    "Description": "Dock workers fight to save their town from corporate takeover.",
+    "ReleaseDate": "2018-04-20",
+    "Genre": "Drama",
+    "Actor": "Mark Ruffalo",
+    "Director": "Todd Haynes",
+    "Producer": "Christine Vachon"
+  },
+  {
+    "Title": "Velocity Point",
+    "Description": "An elite racer risks everything in an underground circuit.",
+    "ReleaseDate": "2020-07-03",
+    "Genre": "Action",
+    "Actor": "Chris Hemsworth",
+    "Director": "Justin Lin",
+    "Producer": "Neal H. Moritz"
+  },
+  {
+    "Title": "Paper Lanterns",
+    "Description": "A coming-of-age story set during a cultural festival.",
+    "ReleaseDate": "2019-11-15",
+    "Genre": "Family",
+    "Actor": "Awkwafina",
+    "Director": "Lulu Wang",
+    "Producer": "Daniele Melia"
+  },
+
+  {
+    "Title": "The Ninth Doorway",
+    "Description": "A historian investigates a cursed manuscript.",
+    "ReleaseDate": "2015-09-18",
+    "Genre": "Horror",
+    "Actor": "Ethan Hawke",
+    "Director": "Robert Eggers",
+    "Producer": "Jay Van Hoy"
+  },
+  {
+    "Title": "After the Tide",
+    "Description": "Survivors rebuild their lives after a devastating tsunami.",
+    "ReleaseDate": "2016-02-05",
+    "Genre": "Drama",
+    "Actor": "Naomi Watts",
+    "Director": "Juan Antonio Bayona",
+    "Producer": "Belén Atienza"
+  },
+  {
+    "Title": "Clockwork City",
+    "Description": "A steampunk inventor uncovers a plot against the city.",
+    "ReleaseDate": "2021-10-01",
+    "Genre": "Adventure",
+    "Actor": "Tom Holland",
+    "Director": "Guy Ritchie",
+    "Producer": "Lionel Wigram"
+  },
+  {
+    "Title": "Fading Footsteps",
+    "Description": "An aging dancer reflects on her past choices.",
+    "ReleaseDate": "2017-03-31",
+    "Genre": "Drama",
+    "Actor": "Cate Blanchett",
+    "Director": "Todd Field",
+    "Producer": "Alexandra Milchan"
+  },
+  {
+    "Title": "Crimson Divide",
+    "Description": "Two rival families clash over land and legacy.",
+    "ReleaseDate": "2018-12-14",
+    "Genre": "Western",
+    "Actor": "Josh Brolin",
+    "Director": "Taylor Sheridan",
+    "Producer": "David Heyman"
+  },
+
+  {
+    "Title": "Northern Lights",
+    "Description": "A photographer captures a phenomenon that defies science.",
+    "ReleaseDate": "2020-01-24",
+    "Genre": "Drama",
+    "Actor": "Amy Adams",
+    "Director": "Jeff Nichols",
+    "Producer": "Sarah Green"
+  },
+  {
+    "Title": "Glass Empire",
+    "Description": "A tech mogul’s empire begins to crumble.",
+    "ReleaseDate": "2021-06-18",
+    "Genre": "Drama",
+    "Actor": "Michael Fassbender",
+    "Director": "Steve McQueen",
+    "Producer": "Dede Gardner"
+  },
+  {
+    "Title": "Burning Junction",
+    "Description": "A wildfire traps strangers in a remote town.",
+    "ReleaseDate": "2019-08-02",
+    "Genre": "Disaster",
+    "Actor": "Emily Blunt",
+    "Director": "Joseph Kosinski",
+    "Producer": "Jerry Bruckheimer"
+  },
+  {
+    "Title": "Moonlit Harbor",
+    "Description": "A widow finds healing in a seaside village.",
+    "ReleaseDate": "2017-05-12",
+    "Genre": "Romance",
+    "Actor": "Rachel McAdams",
+    "Director": "Lasse Hallström",
+    "Producer": "Richard Curtis"
+  },
+  {
+    "Title": "Red Protocol",
+    "Description": "An agent uncovers a global assassination plot.",
+    "ReleaseDate": "2022-07-22",
+    "Genre": "Spy Thriller",
+    "Actor": "Idris Elba",
+    "Director": "Sam Mendes",
+    "Producer": "Barbara Broccoli"
+  },
+
+  {
+    "Title": "Broken Compass",
+    "Description": "An explorer lost in the jungle faces his past.",
+    "ReleaseDate": "2016-10-14",
+    "Genre": "Adventure",
+    "Actor": "Charlie Hunnam",
+    "Director": "James Gray",
+    "Producer": "Anthony Katagas"
+  },
+  {
+    "Title": "Last Call Venice",
+    "Description": "A bartender uncovers secrets of his patrons.",
+    "ReleaseDate": "2018-01-05",
+    "Genre": "Drama",
+    "Actor": "Colin Farrell",
+    "Director": "Martin McDonagh",
+    "Producer": "Graham Broadbent"
+  },
+  {
+    "Title": "Signal Lost",
+    "Description": "Astronauts struggle to survive after losing contact with Earth.",
+    "ReleaseDate": "2021-12-03",
+    "Genre": "Science Fiction",
+    "Actor": "Jessica Chastain",
+    "Director": "Alfonso Cuarón",
+    "Producer": "David Heyman"
+  },
+  {
+    "Title": "Paper Crown",
+    "Description": "A politician rises too fast for his own good.",
+    "ReleaseDate": "2019-04-19",
+    "Genre": "Political Drama",
+    "Actor": "Bryan Cranston",
+    "Director": "Adam McKay",
+    "Producer": "Kevin Messick"
+  },
+  {
+    "Title": "Hollow Ground",
+    "Description": "A town haunted by a decades-old disappearance.",
+    "ReleaseDate": "2020-10-30",
+    "Genre": "Mystery",
+    "Actor": "Florence Pugh",
+    "Director": "David Lowery",
+    "Producer": "Toby Halbrooks"
+  },
+
+  {
+    "Title": "Silver Divide",
+    "Description": "A mining strike turns into a violent standoff.",
+    "ReleaseDate": "2016-04-08",
+    "Genre": "Drama",
+    "Actor": "Christian Bale",
+    "Director": "Scott Cooper",
+    "Producer": "Brett Ratner"
+  },
+  {
+    "Title": "Waking Atlas",
+    "Description": "A man relives the same day across different cities.",
+    "ReleaseDate": "2021-03-19",
+    "Genre": "Science Fiction",
+    "Actor": "Joseph Gordon-Levitt",
+    "Director": "Rian Johnson",
+    "Producer": "Ram Bergman"
+  },
+  {
+    "Title": "River of Dust",
+    "Description": "A journalist investigates illegal mining operations.",
+    "ReleaseDate": "2018-06-01",
+    "Genre": "Thriller",
+    "Actor": "Jeremy Renner",
+    "Director": "Denis Villeneuve",
+    "Producer": "Basil Iwanyk"
+  },
+  {
+    "Title": "Golden Hour",
+    "Description": "Emergency doctors race against time in a city hospital.",
+    "ReleaseDate": "2019-09-20",
+    "Genre": "Drama",
+    "Actor": "Viola Davis",
+    "Director": "Gina Prince-Bythewood",
+    "Producer": "Shonda Rhimes"
+  },
+  {
+    "Title": "Dust & Echoes",
+    "Description": "A poet returns to his drought-stricken hometown.",
+    "ReleaseDate": "2017-08-11",
+    "Genre": "Drama",
+    "Actor": "Dev Patel",
+    "Director": "Mira Nair",
+    "Producer": "Lydia Dean Pilcher"
+  },
+
+  {
+    "Title": "Blackwater Signal",
+    "Description": "A submarine crew encounters the unknown.",
+    "ReleaseDate": "2022-11-04",
+    "Genre": "Sci-Fi Thriller",
+    "Actor": "Jon Bernthal",
+    "Director": "Neil Blomkamp",
+    "Producer": "Simon Kinberg"
+  },
+  {
+    "Title": "Scarlet Avenue",
+    "Description": "A fashion designer navigates betrayal and ambition.",
+    "ReleaseDate": "2016-03-25",
+    "Genre": "Drama",
+    "Actor": "Anne Hathaway",
+    "Director": "Tom Ford",
+    "Producer": "Robert Salerno"
+  },
+  {
+    "Title": "Cold Meridian",
+    "Description": "An Arctic rescue mission turns deadly.",
+    "ReleaseDate": "2020-02-28",
+    "Genre": "Survival",
+    "Actor": "Mads Mikkelsen",
+    "Director": "Joe Penna",
+    "Producer": "Noah C. Haeussner"
+  },
+  {
+    "Title": "Urban Saints",
+    "Description": "Community leaders battle rising gang violence.",
+    "ReleaseDate": "2018-05-04",
+    "Genre": "Crime Drama",
+    "Actor": "Mahershala Ali",
+    "Director": "Ryan Coogler",
+    "Producer": "Charles D. King"
+  },
+  {
+    "Title": "Blue Terminal",
+    "Description": "Lives intersect over one night at an airport.",
+    "ReleaseDate": "2019-12-06",
+    "Genre": "Drama",
+    "Actor": "Sandra Bullock",
+    "Director": "Alejandro González Iñárritu",
+    "Producer": "Nicolás Celis"
+  },
+  {
+    "Title": "Ashfall Line",
+    "Description": "A volcanic eruption threatens to wipe out a coastal nation.",
+    "ReleaseDate": "2021-09-17",
+    "Genre": "Disaster",
+    "Actor": "Dwayne Johnson",
+    "Director": "Brad Peyton",
+    "Producer": "Hiram Garcia"
+  },
+  {
+    "Title": "Quiet Signals",
+    "Description": "A deaf scientist detects patterns no one else can hear.",
+    "ReleaseDate": "2018-02-23",
+    "Genre": "Drama",
+    "Actor": "Sally Hawkins",
+    "Director": "Kelly Reichardt",
+    "Producer": "Neil Kopp"
+  },
+  {
+    "Title": "Iron Orchard",
+    "Description": "Farmers fight a multinational corporation for their land.",
+    "ReleaseDate": "2017-10-06",
+    "Genre": "Drama",
+    "Actor": "Woody Harrelson",
+    "Director": "Debra Granik",
+    "Producer": "Anne Harrison"
+  },
+  {
+    "Title": "Ghosts of Valencia",
+    "Description": "A historian uncovers a hidden civil war massacre.",
+    "ReleaseDate": "2019-03-08",
+    "Genre": "Historical Drama",
+    "Actor": "Javier Bardem",
+    "Director": "Asghar Farhadi",
+    "Producer": "Alexandre Mallet-Guy"
+  },
+  {
+    "Title": "Terminal Velocity",
+    "Description": "A skydiving accident reveals a murder plot.",
+    "ReleaseDate": "2020-06-26",
+    "Genre": "Thriller",
+    "Actor": "Miles Teller",
+    "Director": "Fede Álvarez",
+    "Producer": "Sam Raimi"
+  },
+  {
+    "Title": "Glass Harbor",
+    "Description": "A coastal town struggles after the collapse of its main industry.",
+    "ReleaseDate": "2016-11-18",
+    "Genre": "Drama",
+    "Actor": "Michelle Williams",
+    "Director": "Kenneth Lonergan",
+    "Producer": "Matt Damon"
+  },
+  {
+    "Title": "Red Sand Protocol",
+    "Description": "Mars colonists face sabotage from within.",
+    "ReleaseDate": "2022-04-15",
+    "Genre": "Science Fiction",
+    "Actor": "Rebecca Ferguson",
+    "Director": "Neill Blomkamp",
+    "Producer": "Simon Kinberg"
+  },
+  {
+    "Title": "Broken Vinyl",
+    "Description": "A failed musician attempts a late-life comeback.",
+    "ReleaseDate": "2018-08-24",
+    "Genre": "Drama",
+    "Actor": "Ethan Hawke",
+    "Director": "Richard Linklater",
+    "Producer": "Jonathan Sehring"
+  },
+  {
+    "Title": "The Long Crossing",
+    "Description": "Refugees risk everything to cross hostile borders.",
+    "ReleaseDate": "2017-01-13",
+    "Genre": "Drama",
+    "Actor": "Golshifteh Farahani",
+    "Director": "Jacques Audiard",
+    "Producer": "Pascal Caucheteux"
+  },
+  {
+    "Title": "Neon Divide",
+    "Description": "A futuristic city splits into two warring zones.",
+    "ReleaseDate": "2021-11-12",
+    "Genre": "Cyberpunk",
+    "Actor": "John Boyega",
+    "Director": "Alex Garland",
+    "Producer": "Andrew Macdonald"
+  },
+
+  {
+    "Title": "Feral Coast",
+    "Description": "Marine biologists face a predator thought to be extinct.",
+    "ReleaseDate": "2019-07-19",
+    "Genre": "Survival Thriller",
+    "Actor": "Emily Blunt",
+    "Director": "Jaume Collet-Serra",
+    "Producer": "Akiva Goldsman"
+  },
+  {
+    "Title": "White Chapel Road",
+    "Description": "A crime scene cleaner uncovers disturbing truths.",
+    "ReleaseDate": "2018-12-07",
+    "Genre": "Crime",
+    "Actor": "Riz Ahmed",
+    "Director": "Ben Wheatley",
+    "Producer": "Andy Starke"
+  },
+  {
+    "Title": "Second Sunrise",
+    "Description": "A climate scientist fights political suppression.",
+    "ReleaseDate": "2020-01-31",
+    "Genre": "Political Thriller",
+    "Actor": "Mark Rylance",
+    "Director": "Michael Mann",
+    "Producer": "Pieter Jan Brugge"
+  },
+  {
+    "Title": "Paper Satellites",
+    "Description": "Teen hackers expose government surveillance.",
+    "ReleaseDate": "2017-06-09",
+    "Genre": "Tech Thriller",
+    "Actor": "Ansel Elgort",
+    "Director": "Tony Scott",
+    "Producer": "Jerry Bruckheimer"
+  },
+  {
+    "Title": "Blue Orchard",
+    "Description": "A widow rebuilds her life through organic farming.",
+    "ReleaseDate": "2016-04-22",
+    "Genre": "Drama",
+    "Actor": "Julianne Moore",
+    "Director": "Ang Lee",
+    "Producer": "Gil Netter"
+  },
+  {
+    "Title": "Cinder Block",
+    "Description": "An ex-con tries to go straight in a hostile city.",
+    "ReleaseDate": "2019-10-04",
+    "Genre": "Crime Drama",
+    "Actor": "Tom Hardy",
+    "Director": "David Mackenzie",
+    "Producer": "Basil Iwanyk"
+  },
+  {
+    "Title": "Signal White",
+    "Description": "A mysterious broadcast causes mass hallucinations.",
+    "ReleaseDate": "2022-09-23",
+    "Genre": "Science Fiction",
+    "Actor": "Tilda Swinton",
+    "Director": "Jonathan Glazer",
+    "Producer": "James Wilson"
+  },
+  {
+    "Title": "Crosswind Tokyo",
+    "Description": "An American journalist uncovers a Yakuza scandal.",
+    "ReleaseDate": "2018-05-18",
+    "Genre": "Crime Thriller",
+    "Actor": "Adam Driver",
+    "Director": "Karyn Kusama",
+    "Producer": "Fred Berger"
+  },
+  {
+    "Title": "Rust Horizon",
+    "Description": "A decaying industrial town fights for survival.",
+    "ReleaseDate": "2017-09-29",
+    "Genre": "Drama",
+    "Actor": "Casey Affleck",
+    "Director": "Jeff Nichols",
+    "Producer": "Sarah Green"
+  },
+  {
+    "Title": "Midnight Archive",
+    "Description": "Archivists discover files meant to stay buried.",
+    "ReleaseDate": "2021-02-12",
+    "Genre": "Mystery",
+    "Actor": "Rebecca Hall",
+    "Director": "David Fincher",
+    "Producer": "Ceán Chaffin"
+  },
+
+  {
+    "Title": "Fireline Zero",
+    "Description": "Elite firefighters battle an unstoppable blaze.",
+    "ReleaseDate": "2020-08-07",
+    "Genre": "Action Drama",
+    "Actor": "Josh Brolin",
+    "Director": "Joseph Kosinski",
+    "Producer": "Jerry Bruckheimer"
+  },
+  {
+    "Title": "Glass Choir",
+    "Description": "A composer loses his hearing while finishing his masterpiece.",
+    "ReleaseDate": "2016-12-09",
+    "Genre": "Music Drama",
+    "Actor": "Ralph Fiennes",
+    "Director": "Pawel Pawlikowski",
+    "Producer": "Ewa Puszczynska"
+  },
+  {
+    "Title": "Silent Cartographer",
+    "Description": "A mapmaker uncovers forbidden territories.",
+    "ReleaseDate": "2019-02-01",
+    "Genre": "Adventure",
+    "Actor": "Oscar Isaac",
+    "Director": "James Mangold",
+    "Producer": "Hutch Parker"
+  },
+  {
+    "Title": "Neon Orchard",
+    "Description": "A cybernetic farmer resists corporate control.",
+    "ReleaseDate": "2022-05-27",
+    "Genre": "Sci-Fi Drama",
+    "Actor": "Lakeith Stanfield",
+    "Director": "Boots Riley",
+    "Producer": "Nina Yang Bongiovi"
+  },
+  {
+    "Title": "The Last Broadcast",
+    "Description": "A TV station stays live during a citywide collapse.",
+    "ReleaseDate": "2021-10-22",
+    "Genre": "Thriller",
+    "Actor": "Rosamund Pike",
+    "Director": "Paul Greengrass",
+    "Producer": "Greg Goodman"
+  },
+  {
+    "Title": "Iron Skyfall",
+    "Description": "A failed satellite triggers global panic.",
+    "ReleaseDate": "2019-06-14",
+    "Genre": "Action Thriller",
+    "Actor": "Gerard Butler",
+    "Director": "Ric Roman Waugh",
+    "Producer": "Alan Siegel"
+  },
+  {
+    "Title": "Velvet Silence",
+    "Description": "A pianist confronts trauma after losing her ability to perform.",
+    "ReleaseDate": "2017-02-17",
+    "Genre": "Drama",
+    "Actor": "Marion Cotillard",
+    "Director": "Jacques Audiard",
+    "Producer": "Jean-Louis Livi"
+  },
+  {
+    "Title": "Last Ember",
+    "Description": "A dying coal town ignites one final rebellion.",
+    "ReleaseDate": "2018-09-28",
+    "Genre": "Drama",
+    "Actor": "Sam Rockwell",
+    "Director": "David Gordon Green",
+    "Producer": "Danny McBride"
+  },
+  {
+    "Title": "Orbit Nine",
+    "Description": "Scientists trapped in orbit uncover a secret experiment.",
+    "ReleaseDate": "2021-01-08",
+    "Genre": "Science Fiction",
+    "Actor": "Gugu Mbatha-Raw",
+    "Director": "Duncan Jones",
+    "Producer": "Stuart Fenegan"
+  },
+  {
+    "Title": "Black Finch",
+    "Description": "An investigative reporter risks everything for one last story.",
+    "ReleaseDate": "2016-11-04",
+    "Genre": "Political Thriller",
+    "Actor": "Edward Norton",
+    "Director": "George Clooney",
+    "Producer": "Grant Heslov"
+  },
+
+  {
+    "Title": "Static River",
+    "Description": "A power outage reveals a town’s darkest secrets.",
+    "ReleaseDate": "2020-03-13",
+    "Genre": "Mystery",
+    "Actor": "Elisabeth Moss",
+    "Director": "Karyn Kusama",
+    "Producer": "Fred Berger"
+  },
+  {
+    "Title": "Cracked Halo",
+    "Description": "A fallen megachurch pastor faces public reckoning.",
+    "ReleaseDate": "2019-10-18",
+    "Genre": "Drama",
+    "Actor": "Oscar Isaac",
+    "Director": "Paul Schrader",
+    "Producer": "Scott Franklin"
+  },
+  {
+    "Title": "Silver Current",
+    "Description": "Deep-sea miners awaken an ancient force.",
+    "ReleaseDate": "2022-08-19",
+    "Genre": "Sci-Fi Horror",
+    "Actor": "Jessica Henwick",
+    "Director": "Leigh Whannell",
+    "Producer": "Jason Blum"
+  },
+  {
+    "Title": "The Final Acre",
+    "Description": "A legal battle threatens generational farmland.",
+    "ReleaseDate": "2017-04-21",
+    "Genre": "Drama",
+    "Actor": "Laura Dern",
+    "Director": "Debra Granik",
+    "Producer": "Anne Harrison"
+  },
+  {
+    "Title": "Dead Signal Road",
+    "Description": "Travelers vanish along an unmarked highway.",
+    "ReleaseDate": "2018-10-12",
+    "Genre": "Horror",
+    "Actor": "Logan Marshall-Green",
+    "Director": "Jeremy Saulnier",
+    "Producer": "Anish Savjani"
+  },
+
+  {
+    "Title": "Paper Giants",
+    "Description": "A publishing empire collapses in the digital age.",
+    "ReleaseDate": "2016-05-06",
+    "Genre": "Drama",
+    "Actor": "Jeff Daniels",
+    "Director": "Alexander Payne",
+    "Producer": "Jim Taylor"
+  },
+  {
+    "Title": "Red Bloom",
+    "Description": "A botanist discovers a plant with deadly properties.",
+    "ReleaseDate": "2021-04-23",
+    "Genre": "Thriller",
+    "Actor": "Emily Watson",
+    "Director": "Lynne Ramsay",
+    "Producer": "Charles Gillibert"
+  },
+  {
+    "Title": "Ash & Ivory",
+    "Description": "A sculptor returns home after decades of exile.",
+    "ReleaseDate": "2019-01-25",
+    "Genre": "Drama",
+    "Actor": "Benicio del Toro",
+    "Director": "Alejandro González Iñárritu",
+    "Producer": "Nicolás Celis"
+  },
+  {
+    "Title": "Neural Gate",
+    "Description": "A brain-computer interface leaks human memories.",
+    "ReleaseDate": "2022-06-10",
+    "Genre": "Science Fiction",
+    "Actor": "Rami Malek",
+    "Director": "Alex Garland",
+    "Producer": "Andrew Macdonald"
+  },
+  {
+    "Title": "Salt Meridian",
+    "Description": "Smugglers clash across desert borders.",
+    "ReleaseDate": "2018-07-20",
+    "Genre": "Crime Thriller",
+    "Actor": "Gael García Bernal",
+    "Director": "Stefano Sollima",
+    "Producer": "Pablo Cruz"
+  },
+
+  {
+    "Title": "The Quiet Forge",
+    "Description": "A master blacksmith trains an unlikely apprentice.",
+    "ReleaseDate": "2017-12-01",
+    "Genre": "Drama",
+    "Actor": "Brendan Gleeson",
+    "Director": "John Michael McDonagh",
+    "Producer": "Chris Collins"
+  },
+  {
+    "Title": "Shadow Terminal",
+    "Description": "Customs officers uncover a trafficking network.",
+    "ReleaseDate": "2020-09-04",
+    "Genre": "Crime",
+    "Actor": "Rebecca Ferguson",
+    "Director": "Denis Villeneuve",
+    "Producer": "Tanya Lapointe"
+  },
+  {
+    "Title": "White Noise Valley",
+    "Description": "A radio tower causes unexplained phenomena.",
+    "ReleaseDate": "2019-08-09",
+    "Genre": "Mystery",
+    "Actor": "Adam Scott",
+    "Director": "Jeff Nichols",
+    "Producer": "Sarah Green"
+  },
+  {
+    "Title": "Copper Saints",
+    "Description": "Rookie cops struggle with corruption in their ranks.",
+    "ReleaseDate": "2016-06-24",
+    "Genre": "Crime Drama",
+    "Actor": "Michael B. Jordan",
+    "Director": "Antoine Fuqua",
+    "Producer": "Todd Black"
+  },
+  {
+    "Title": "Midnight Orchard",
+    "Description": "A family vineyard hides generations of secrets.",
+    "ReleaseDate": "2018-03-30",
+    "Genre": "Drama",
+    "Actor": "Penélope Cruz",
+    "Director": "Isabel Coixet",
+    "Producer": "Juan Gordon"
+  },
+
+  {
+    "Title": "Black Ice Run",
+    "Description": "Illegal racers dominate frozen highways.",
+    "ReleaseDate": "2021-12-17",
+    "Genre": "Action",
+    "Actor": "Sebastian Stan",
+    "Director": "David Leitch",
+    "Producer": "Kelly McCormick"
+  },
+  {
+    "Title": "Ash Cathedral",
+    "Description": "A priest questions faith after a disaster.",
+    "ReleaseDate": "2017-09-15",
+    "Genre": "Drama",
+    "Actor": "Andrew Garfield",
+    "Director": "Martin Scorsese",
+    "Producer": "Emma Tillinger Koskoff"
+  },
+  {
+    "Title": "The Glass Frontier",
+    "Description": "Architects design a city meant to survive climate collapse.",
+    "ReleaseDate": "2022-03-18",
+    "Genre": "Sci-Fi Drama",
+    "Actor": "Rebecca Hall",
+    "Director": "Mike Cahill",
+    "Producer": "Anthony Bregman"
+  },
+  {
+    "Title": "Final Dispatch",
+    "Description": "Journalists publish one last edition during a coup.",
+    "ReleaseDate": "2020-11-20",
+    "Genre": "Political Drama",
+    "Actor": "Liev Schreiber",
+    "Director": "Costa-Gavras",
+    "Producer": "Edouard Waintrop"
+  },
+  {
+    "Title": "Silent Latitude",
+    "Description": "A solo sailor survives weeks lost at sea.",
+    "ReleaseDate": "2019-05-03",
+    "Genre": "Survival",
+    "Actor": "Robert Redford",
+    "Director": "J.C. Chandor",
+    "Producer": "Neal Dodson"
+  },
+  {
+    "Title": "Amber Fault",
+    "Description": "A seismologist predicts an earthquake no one believes.",
+    "ReleaseDate": "2018-04-13",
+    "Genre": "Disaster Thriller",
+    "Actor": "Aaron Eckhart",
+    "Director": "Brad Peyton",
+    "Producer": "Beau Flynn"
+  },
+  {
+    "Title": "Night Ferry",
+    "Description": "Passengers vanish during a midnight river crossing.",
+    "ReleaseDate": "2019-10-25",
+    "Genre": "Mystery Thriller",
+    "Actor": "Emily Browning",
+    "Director": "David Robert Mitchell",
+    "Producer": "Jake Weiner"
+  },
+  {
+    "Title": "Iron Parish",
+    "Description": "A small-town sheriff battles a rising extremist group.",
+    "ReleaseDate": "2017-06-02",
+    "Genre": "Crime Drama",
+    "Actor": "Jeff Bridges",
+    "Director": "David Mackenzie",
+    "Producer": "Carla Hacken"
+  },
+  {
+    "Title": "Solar Wake",
+    "Description": "A solar storm wipes out global communication.",
+    "ReleaseDate": "2021-07-16",
+    "Genre": "Science Fiction",
+    "Actor": "Yahya Abdul-Mateen II",
+    "Director": "Denis Villeneuve",
+    "Producer": "Mary Parent"
+  },
+  {
+    "Title": "Hinterland Blue",
+    "Description": "A homicide investigation exposes rural corruption.",
+    "ReleaseDate": "2016-09-23",
+    "Genre": "Crime",
+    "Actor": "Joel Edgerton",
+    "Director": "Justin Kurzel",
+    "Producer": "Liz Watts"
+  },
+
+  {
+    "Title": "Fallow Year",
+    "Description": "A farming family survives drought and debt.",
+    "ReleaseDate": "2018-02-02",
+    "Genre": "Drama",
+    "Actor": "Carey Mulligan",
+    "Director": "Andrea Arnold",
+    "Producer": "Lars Knudsen"
+  },
+  {
+    "Title": "Black Channel",
+    "Description": "Pirates hijack a data-carrying cargo ship.",
+    "ReleaseDate": "2020-08-21",
+    "Genre": "Action Thriller",
+    "Actor": "Jason Statham",
+    "Director": "Paul Greengrass",
+    "Producer": "Lloyd Phillips"
+  },
+  {
+    "Title": "Paper Suns",
+    "Description": "Street photographers document a city in transition.",
+    "ReleaseDate": "2017-11-03",
+    "Genre": "Drama",
+    "Actor": "Zazie Beetz",
+    "Director": "Barry Jenkins",
+    "Producer": "Adele Romanski"
+  },
+  {
+    "Title": "Cold Frame",
+    "Description": "A forensic photographer uncovers staged crime scenes.",
+    "ReleaseDate": "2019-01-11",
+    "Genre": "Thriller",
+    "Actor": "Rosamund Pike",
+    "Director": "David Fincher",
+    "Producer": "Ceán Chaffin"
+  },
+  {
+    "Title": "Red Atlas",
+    "Description": "Explorers map a newly exposed polar landmass.",
+    "ReleaseDate": "2022-02-18",
+    "Genre": "Adventure",
+    "Actor": "Pedro Pascal",
+    "Director": "James Gray",
+    "Producer": "Rodrigo Teixeira"
+  },
+
+  {
+    "Title": "Brick by Brick",
+    "Description": "Urban planners fight forced evictions.",
+    "ReleaseDate": "2016-05-20",
+    "Genre": "Drama",
+    "Actor": "Regina King",
+    "Director": "Ava DuVernay",
+    "Producer": "Paul Garnes"
+  },
+  {
+    "Title": "Tungsten Sky",
+    "Description": "Fighter pilots test an experimental aircraft.",
+    "ReleaseDate": "2020-07-10",
+    "Genre": "Action",
+    "Actor": "Glen Powell",
+    "Director": "Joseph Kosinski",
+    "Producer": "Jerry Bruckheimer"
+  },
+  {
+    "Title": "Blue Static",
+    "Description": "A coastal town experiences unexplained radio signals.",
+    "ReleaseDate": "2018-08-03",
+    "Genre": "Sci-Fi Mystery",
+    "Actor": "Elizabeth Debicki",
+    "Director": "Alex Garland",
+    "Producer": "Andrew Macdonald"
+  },
+  {
+    "Title": "False Summit",
+    "Description": "Climbers discover a body near the mountain peak.",
+    "ReleaseDate": "2019-12-13",
+    "Genre": "Survival Thriller",
+    "Actor": "Jake Johnson",
+    "Director": "Joe Penna",
+    "Producer": "Lucas Ochoa"
+  },
+  {
+    "Title": "The Quiet Mile",
+    "Description": "A parole officer mentors a former gang leader.",
+    "ReleaseDate": "2017-03-10",
+    "Genre": "Drama",
+    "Actor": "Mahershala Ali",
+    "Director": "Barry Jenkins",
+    "Producer": "Dede Gardner"
+  },
+
+  {
+    "Title": "Glass Current",
+    "Description": "An art restorer uncovers a forged masterpiece.",
+    "ReleaseDate": "2021-05-14",
+    "Genre": "Mystery",
+    "Actor": "Rachel Weisz",
+    "Director": "Sebastián Lelio",
+    "Producer": "Juan de Dios Larraín"
+  },
+  {
+    "Title": "Burn Line",
+    "Description": "Fire investigators track a serial arsonist.",
+    "ReleaseDate": "2018-06-29",
+    "Genre": "Crime Thriller",
+    "Actor": "Jon Hamm",
+    "Director": "Jeremy Saulnier",
+    "Producer": "Neil Kopp"
+  },
+  {
+    "Title": "White Orchard",
+    "Description": "A snowbound village hides a missing child.",
+    "ReleaseDate": "2020-01-17",
+    "Genre": "Mystery Drama",
+    "Actor": "Noomi Rapace",
+    "Director": "Tomas Alfredson",
+    "Producer": "Robyn Slovo"
+  },
+  {
+    "Title": "Pulse Divide",
+    "Description": "Paramedics face impossible moral choices.",
+    "ReleaseDate": "2019-04-05",
+    "Genre": "Drama",
+    "Actor": "Oscar Isaac",
+    "Director": "Jean-Marc Vallée",
+    "Producer": "Nathan Ross"
+  },
+  {
+    "Title": "Carbon Shore",
+    "Description": "Environmental lawyers battle a petrochemical giant.",
+    "ReleaseDate": "2022-09-09",
+    "Genre": "Legal Drama",
+    "Actor": "Mark Ruffalo",
+    "Director": "Todd Haynes",
+    "Producer": "Christine Vachon"
+  },
+
+  {
+    "Title": "Last Signal North",
+    "Description": "A weather station goes silent in the Arctic.",
+    "ReleaseDate": "2021-11-05",
+    "Genre": "Thriller",
+    "Actor": "Alexander Skarsgård",
+    "Director": "Jeremy Saulnier",
+    "Producer": "Anish Savjani"
+  },
+  {
+    "Title": "Rust Chapel",
+    "Description": "A dying steel town clings to faith and memory.",
+    "ReleaseDate": "2016-10-07",
+    "Genre": "Drama",
+    "Actor": "Woody Harrelson",
+    "Director": "Scott Cooper",
+    "Producer": "Ridley Scott"
+  },
+  {
+    "Title": "Neon Barricade",
+    "Description": "Protesters clash with authorities in a megacity.",
+    "ReleaseDate": "2020-06-05",
+    "Genre": "Political Thriller",
+    "Actor": "Lakeith Stanfield",
+    "Director": "Kasi Lemmons",
+    "Producer": "Nina Yang Bongiovi"
+  },
+  {
+    "Title": "Stillwater Maps",
+    "Description": "A cartographer charts flood zones and human loss.",
+    "ReleaseDate": "2018-12-21",
+    "Genre": "Drama",
+    "Actor": "Ben Whishaw",
+    "Director": "Andrea Arnold",
+    "Producer": "Thomas Benski"
+  },
+  {
+    "Title": "Final Light Station",
+    "Description": "A lighthouse keeper faces isolation and madness.",
+    "ReleaseDate": "2019-07-26",
+    "Genre": "Psychological Drama",
+    "Actor": "Willem Dafoe",
+    "Director": "Robert Eggers",
+    "Producer": "Chris Columbus"
+  }
+]

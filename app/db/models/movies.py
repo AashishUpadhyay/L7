@@ -12,6 +12,7 @@ from app.db.models.movie_genre import MovieGenre
 
 if TYPE_CHECKING:
     from app.db.models.movie_person import MoviePerson
+    from app.db.models.review import Review
 
 
 class Movie(Base):
@@ -22,6 +23,7 @@ class Movie(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     release_date: Mapped[dt.date | None] = mapped_column(Date, nullable=True)
     rating: Mapped[float | None] = mapped_column(Float, nullable=True)
+    image_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
@@ -40,6 +42,12 @@ class Movie(Base):
     )
     movie_persons: Mapped[list[MoviePerson]] = relationship(
         "MoviePerson",
+        back_populates="movie",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    reviews: Mapped[list[Review]] = relationship(
+        "Review",
         back_populates="movie",
         cascade="all, delete-orphan",
         lazy="selectin",

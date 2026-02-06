@@ -49,6 +49,7 @@ class TestMoviesApi:
         assert isinstance(data["id"], int)
         assert data["title"] == payload["title"]
         assert data["genres"] == expected_genres  # API returns list of enum values
+        assert "image_path" in data
         assert "created_at" in data
         assert "updated_at" in data
 
@@ -110,6 +111,7 @@ class TestMoviesApi:
         assert data["id"] == movie_id
         assert data["title"] == "Read Me"
         assert data["genres"] == [1]
+        assert "image_path" in data
         assert "created_at" in data
         assert "updated_at" in data
 
@@ -140,6 +142,7 @@ class TestMoviesApi:
         assert data["title"] == "Updated Title"
         assert data["genres"] == [1]  # unchanged
         assert data["rating"] == 9.0
+        assert "image_path" in data
 
     def test_update_movie_with_multiple_genres_replaces_genres(self, base_url: str) -> None:
         """PATCH /movies/{id} with genres replaces existing genres with the new list."""
@@ -263,6 +266,7 @@ class TestMoviesApi:
             assert "id" in item
             assert "title" in item
             assert "genres" in item
+            assert "image_path" in item
 
     def test_add_person_to_movie_returns_201_and_body(self, base_url: str) -> None:
         """POST /movies/{id}/persons adds a person in a role and returns 201."""

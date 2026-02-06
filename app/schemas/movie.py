@@ -53,6 +53,7 @@ class MovieUpdate(BaseModel):
     release_date: date | None = None
     genres: list[Genre] | None = Field(None, min_length=1)
     rating: float | None = None
+    image_path: str | None = None
 
     model_config = ConfigDict(
         json_schema_extra={"examples": [{"title": "Updated Title", "rating": 9.0}]}
@@ -68,6 +69,7 @@ class MovieResponse(BaseModel):
     release_date: date | None
     genres: list[Genre]
     rating: float | None
+    image_path: str | None
     created_at: datetime
     updated_at: datetime
 

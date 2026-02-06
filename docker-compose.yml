@@ -8,6 +8,7 @@ services:
       - 9000:9000
     volumes:
       - .appdata/app:/app/data
+      - .appdata/uploads:/app/uploads
     depends_on:
       - imdb-db
     environment:
@@ -17,6 +18,9 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=imdb_db
       - LOG_DIR=/app/data/logs
+      - STORAGE_BACKEND=local
+      - STORAGE_LOCAL_PATH=/app/uploads
+      - STORAGE_LOCAL_URL=/static/uploads
 
   imdb-db:
     image: postgres:14-alpine
@@ -29,10 +33,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=imdb_db
 
-  admin-panel:
-    container_name: admin-panel
+  ui:
+    container_name: ui
     build:
-      context: ./admin-panel
+      context: ./ui
       dockerfile: Dockerfile
       args:
         - VITE_API_BASE_URL=http://localhost:9000
@@ -58,6 +62,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "9001:9000"
+    volumes:
+      - .appdata/uploads-test:/app/uploads
     depends_on:
       - imdb-db-test
     environment:
@@ -67,6 +73,9 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=imdb_db
       - LOG_DIR=/app/data/logs
+      - STORAGE_BACKEND=local
+      - STORAGE_LOCAL_PATH=/app/uploads
+      - STORAGE_LOCAL_URL=/static/uploads
 
   imdb-integration-tests:
     container_name: imdb-integration-tests

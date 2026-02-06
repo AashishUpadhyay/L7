@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.db.models.genre import Genre
+from app.db.models.role import MovieRole
 
 
 class PersonCreate(BaseModel):
@@ -29,6 +30,7 @@ class PersonResponse(BaseModel):
     email: str
     created_at: datetime
     updated_at: datetime
+    movie_count: int | None = None  # Optional field for list views
 
 
 class PersonListResponse(BaseModel):
@@ -46,5 +48,6 @@ class PersonSearchRequest(BaseModel):
     genres: list[Genre] | None = (
         None  # OR: persons who participated in movies with any of these genres
     )
+    roles: list[MovieRole] | None = None  # OR: persons who have any of these roles
     skip: int = Field(0, ge=0, description="Number of records to skip (for paging).")
     limit: int = Field(20, ge=1, le=100, description="Maximum number of records to return (1–100).")

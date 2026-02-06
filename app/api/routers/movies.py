@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy import delete, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -8,6 +8,7 @@ from app.db.models.movie_genre import MovieGenre
 from app.db.models.movie_person import MoviePerson
 from app.db.models.movies import Movie
 from app.db.models.person import Person
+from app.db.models.review import Review
 from app.db.models.role import MovieRole
 from app.db.session import get_db
 from app.schemas.movie import (
@@ -18,7 +19,13 @@ from app.schemas.movie import (
     MovieSearchRequest,
     MovieUpdate,
 )
-from app.schemas.movie_person import AddPersonToMovieRequest, MoviePersonResponse
+from app.schemas.movie_person import (
+    AddPersonToMovieRequest,
+    MoviePersonResponse,
+    PersonInMovieResponse,
+)
+from app.schemas.review import ReviewCreate, ReviewListResponse, ReviewResponse
+from app.storage.config import get_storage
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -229,6 +236,38 @@ def delete_movie(movie_id: int, db: Session = Depends(get_db)) -> None:
     db.commit()
 
 
+@router.get(
+    "/{movie_id}/persons",
+    response_model=list[PersonInMovieResponse],
+    summary="Get persons in movie",
+    description="Returns all persons associated with a movie along with their roles.",
+    responses={
+        200: {"description": "List of persons in movie returned successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
+def get_movie_persons(movie_id: int, db: Session = Depends(get_db)) -> list[PersonInMovieResponse]:
+    """Get all persons associated with a movie."""
+    _get_movie(movie_id, db)
+    stmt = (
+        select(MoviePerson, Person)
+        .join(Person, MoviePerson.person_id == Person.id)
+        .where(MoviePerson.movie_id == movie_id)
+        .order_by(MoviePerson.role, Person.name)
+    )
+    results = db.execute(stmt).all()
+    return [
+        PersonInMovieResponse(
+            id=mp.id,
+            person_id=mp.person_id,
+            person_name=person.name,
+            person_email=person.email,
+            role=mp.role,
+        )
+        for mp, person in results
+    ]
+
+
 @router.post(
     "/{movie_id}/persons",
     response_model=list[MoviePersonResponse],
@@ -318,3 +357,209 @@ def add_person_to_movie(
             detail="This person is already assigned to this movie in this role.",
         ) from e
     return created
+
+
+@router.delete(
+    "/{movie_id}/persons/{person_id}",
+    status_code=204,
+    summary="Remove person from movie",
+    description="Removes a person from a movie in a specific role. If role is not specified, removes all associations between the person and movie.",
+    responses={
+        204: {"description": "Person removed from movie successfully."},
+        404: {"description": "Movie, person, or association not found."},
+    },
+)
+def remove_person_from_movie(
+    movie_id: int,
+    person_id: int,
+    role: MovieRole | None = Query(
+        None, description="Specific role to remove. If not provided, removes all roles."
+    ),
+    db: Session = Depends(get_db),
+) -> None:
+    """Remove a person from a movie in a specific role or all roles."""
+    _get_movie(movie_id, db)
+    _get_person(person_id, db)
+
+    if role is not None:
+        stmt = delete(MoviePerson).where(
+            MoviePerson.movie_id == movie_id,
+            MoviePerson.person_id == person_id,
+            MoviePerson.role == role,
+        )
+    else:
+        stmt = delete(MoviePerson).where(
+            MoviePerson.movie_id == movie_id,
+            MoviePerson.person_id == person_id,
+        )
+
+    result = db.execute(stmt)
+    if result.rowcount == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="Association not found between this movie and person.",
+        )
+    db.commit()
+
+
+@router.post(
+    "/{movie_id}/upload-image",
+    response_model=MovieResponse,
+    summary="Upload movie image",
+    description="Upload an image for a movie. Supports common image formats (JPEG, PNG, GIF, WebP).",
+    responses={
+        200: {"description": "Image uploaded successfully, movie updated with image path."},
+        400: {"description": "Invalid file type or file too large."},
+        404: {"description": "Movie not found."},
+    },
+)
+async def upload_movie_image(
+    movie_id: int,
+    file: UploadFile = File(..., description="Image file to upload"),
+    db: Session = Depends(get_db),
+) -> Movie:
+    """Upload an image for a movie."""
+    movie = _get_movie(movie_id, db)
+
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed types: {', '.join(allowed_types)}",
+        )
+
+    # Validate file size (max 10MB)
+    max_size = 10 * 1024 * 1024  # 10MB
+    file.file.seek(0, 2)  # Seek to end
+    file_size = file.file.tell()
+    file.file.seek(0)  # Seek back to start
+
+    if file_size > max_size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Maximum size is {max_size // (1024 * 1024)}MB",
+        )
+
+    # Delete old image if exists
+    storage = get_storage()
+    if movie.image_path:
+        await storage.delete(movie.image_path)
+
+    # Save new image
+    try:
+        image_path = await storage.save(file.file, file.filename or "image.jpg", file.content_type)
+        movie.image_path = image_path
+        db.commit()
+        db.refresh(movie)
+        return movie
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload image: {str(e)}",
+        ) from e
+
+
+@router.get(
+    "/{movie_id}/reviews",
+    response_model=ReviewListResponse,
+    summary="Get movie reviews",
+    description="Returns paginated reviews for a specific movie along with the average rating.",
+    responses={
+        200: {"description": "List of reviews returned successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
+def get_movie_reviews(
+    movie_id: int,
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0, description="Number of records to skip (for paging)."),
+    limit: int = Query(
+        20, ge=1, le=100, description="Maximum number of records to return (1–100)."
+    ),
+) -> ReviewListResponse:
+    """Get all reviews for a movie with pagination."""
+    _get_movie(movie_id, db)
+
+    # Get total count and average rating
+    total = db.query(Review).filter(Review.movie_id == movie_id).count()
+    avg_rating = db.query(func.avg(Review.rating)).filter(Review.movie_id == movie_id).scalar()
+
+    # Get paginated reviews
+    reviews = (
+        db.execute(
+            select(Review)
+            .where(Review.movie_id == movie_id)
+            .order_by(Review.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        .scalars()
+        .all()
+    )
+
+    return ReviewListResponse(
+        items=reviews,
+        total=total,
+        skip=skip,
+        limit=limit,
+        average_rating=round(float(avg_rating), 1) if avg_rating else None,
+    )
+
+
+@router.post(
+    "/{movie_id}/reviews",
+    response_model=ReviewResponse,
+    status_code=201,
+    summary="Create movie review",
+    description="Add a new review for a movie.",
+    responses={
+        201: {"description": "Review created successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
+def create_movie_review(
+    movie_id: int,
+    payload: ReviewCreate,
+    db: Session = Depends(get_db),
+) -> Review:
+    """Create a new review for a movie."""
+    _get_movie(movie_id, db)
+
+    review = Review(
+        movie_id=movie_id,
+        author_name=payload.author_name,
+        rating=payload.rating,
+        content=payload.content,
+    )
+    db.add(review)
+    db.commit()
+    db.refresh(review)
+    return review
+
+
+@router.delete(
+    "/{movie_id}/reviews/{review_id}",
+    status_code=204,
+    summary="Delete movie review",
+    description="Delete a specific review from a movie.",
+    responses={
+        204: {"description": "Review deleted successfully."},
+        404: {"description": "Movie or review not found."},
+    },
+)
+def delete_movie_review(
+    movie_id: int,
+    review_id: int,
+    db: Session = Depends(get_db),
+) -> None:
+    """Delete a review."""
+    _get_movie(movie_id, db)
+
+    review = db.get(Review, review_id)
+    if review is None or review.movie_id != movie_id:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    db.delete(review)
+    db.commit()
