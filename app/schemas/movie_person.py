@@ -40,3 +40,7 @@ class MovieInPersonResponse(BaseModel):
     movie_id: int
     movie_title: str
     role: MovieRole
+    image_path: str | None = None
+    rating: float | None = None
+    release_date: str | None = None
+    genres: list[int] = []

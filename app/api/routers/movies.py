@@ -8,6 +8,7 @@ from app.db.models.movie_genre import MovieGenre
 from app.db.models.movie_person import MoviePerson
 from app.db.models.movies import Movie
 from app.db.models.person import Person
+from app.db.models.review import Review
 from app.db.models.role import MovieRole
 from app.db.session import get_db
 from app.schemas.movie import (
@@ -23,6 +24,7 @@ from app.schemas.movie_person import (
     MoviePersonResponse,
     PersonInMovieResponse,
 )
+from app.schemas.review import ReviewCreate, ReviewListResponse, ReviewResponse
 from app.storage.config import get_storage
 
 router = APIRouter(prefix="/movies", tags=["movies"])
@@ -457,3 +459,107 @@ async def upload_movie_image(
             status_code=500,
             detail=f"Failed to upload image: {str(e)}",
         ) from e
+
+
+@router.get(
+    "/{movie_id}/reviews",
+    response_model=ReviewListResponse,
+    summary="Get movie reviews",
+    description="Returns paginated reviews for a specific movie along with the average rating.",
+    responses={
+        200: {"description": "List of reviews returned successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
+def get_movie_reviews(
+    movie_id: int,
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0, description="Number of records to skip (for paging)."),
+    limit: int = Query(
+        20, ge=1, le=100, description="Maximum number of records to return (1–100)."
+    ),
+) -> ReviewListResponse:
+    """Get all reviews for a movie with pagination."""
+    _get_movie(movie_id, db)
+
+    # Get total count and average rating
+    total = db.query(Review).filter(Review.movie_id == movie_id).count()
+    avg_rating = db.query(func.avg(Review.rating)).filter(Review.movie_id == movie_id).scalar()
+
+    # Get paginated reviews
+    reviews = (
+        db.execute(
+            select(Review)
+            .where(Review.movie_id == movie_id)
+            .order_by(Review.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        .scalars()
+        .all()
+    )
+
+    return ReviewListResponse(
+        items=reviews,
+        total=total,
+        skip=skip,
+        limit=limit,
+        average_rating=round(float(avg_rating), 1) if avg_rating else None,
+    )
+
+
+@router.post(
+    "/{movie_id}/reviews",
+    response_model=ReviewResponse,
+    status_code=201,
+    summary="Create movie review",
+    description="Add a new review for a movie.",
+    responses={
+        201: {"description": "Review created successfully."},
+        404: {"description": "Movie not found."},
+    },
+)
+def create_movie_review(
+    movie_id: int,
+    payload: ReviewCreate,
+    db: Session = Depends(get_db),
+) -> Review:
+    """Create a new review for a movie."""
+    _get_movie(movie_id, db)
+
+    review = Review(
+        movie_id=movie_id,
+        author_name=payload.author_name,
+        rating=payload.rating,
+        content=payload.content,
+    )
+    db.add(review)
+    db.commit()
+    db.refresh(review)
+    return review
+
+
+@router.delete(
+    "/{movie_id}/reviews/{review_id}",
+    status_code=204,
+    summary="Delete movie review",
+    description="Delete a specific review from a movie.",
+    responses={
+        204: {"description": "Review deleted successfully."},
+        404: {"description": "Movie or review not found."},
+    },
+)
+def delete_movie_review(
+    movie_id: int,
+    review_id: int,
+    db: Session = Depends(get_db),
+) -> None:
+    """Delete a review."""
+    _get_movie(movie_id, db)
+
+    review = db.get(Review, review_id)
+    if review is None or review.movie_id != movie_id:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    db.delete(review)
+    db.commit()

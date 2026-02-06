@@ -237,6 +237,8 @@ def get_person(person_id: int, db: Session = Depends(get_db)) -> Person:
 )
 def get_person_movies(person_id: int, db: Session = Depends(get_db)) -> list[MovieInPersonResponse]:
     """Get all movies associated with a person."""
+    from app.db.models.movie_genre import MovieGenre
+
     _get_person(person_id, db)
     stmt = (
         select(MoviePerson, Movie)
@@ -245,12 +247,29 @@ def get_person_movies(person_id: int, db: Session = Depends(get_db)) -> list[Mov
         .order_by(MoviePerson.role, Movie.title)
     )
     results = db.execute(stmt).all()
+
+    # Fetch genres for each movie
+    movie_ids = [movie.id for _, movie in results]
+    genre_stmt = select(MovieGenre).where(MovieGenre.movie_id.in_(movie_ids))
+    genre_results = db.execute(genre_stmt).scalars().all()
+
+    # Group genres by movie_id
+    genres_by_movie: dict[int, list[int]] = {}
+    for mg in genre_results:
+        if mg.movie_id not in genres_by_movie:
+            genres_by_movie[mg.movie_id] = []
+        genres_by_movie[mg.movie_id].append(mg.genre)
+
     return [
         MovieInPersonResponse(
             id=mp.id,
             movie_id=mp.movie_id,
             movie_title=movie.title,
             role=mp.role,
+            image_path=movie.image_path,
+            rating=movie.rating,
+            release_date=movie.release_date.isoformat() if movie.release_date else None,
+            genres=genres_by_movie.get(movie.id, []),
         )
         for mp, movie in results
     ]

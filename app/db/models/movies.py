@@ -12,6 +12,7 @@ from app.db.models.movie_genre import MovieGenre
 
 if TYPE_CHECKING:
     from app.db.models.movie_person import MoviePerson
+    from app.db.models.review import Review
 
 
 class Movie(Base):
@@ -41,6 +42,12 @@ class Movie(Base):
     )
     movie_persons: Mapped[list[MoviePerson]] = relationship(
         "MoviePerson",
+        back_populates="movie",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    reviews: Mapped[list[Review]] = relationship(
+        "Review",
         back_populates="movie",
         cascade="all, delete-orphan",
         lazy="selectin",

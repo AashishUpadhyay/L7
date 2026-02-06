@@ -37,10 +37,10 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: admin-panel/package-lock.json
+          cache-dependency-path: ui/package-lock.json
 
-      - name: Install admin-panel dependencies
-        run: cd admin-panel && npm ci
+      - name: Install ui dependencies
+        run: cd ui && npm ci
 
       - name: Run UI tests
         run: make test-ui

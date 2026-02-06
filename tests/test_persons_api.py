@@ -527,3 +527,143 @@ class TestPersonsApi:
         ids = [p["id"] for p in data["items"]]
         assert pid1 in ids
         assert pid2 not in ids
+
+    def test_get_person_movies_returns_detailed_movie_info(self, base_url: str) -> None:
+        """GET /persons/{id}/movies returns movies with detailed info (image, rating, release_date, genres)."""
+        with httpx.Client(timeout=10.0) as client:
+            # Create a person
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "John Actor", "email": _unique_email("johnactor")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            # Create a movie with full details
+            movie_resp = client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": "Test Movie with Details",
+                    "genres": [1, 3],  # Action, Drama
+                    "rating": 8.5,
+                    "release_date": "2024-01-15",
+                    "description": "A test movie",
+                },
+            )
+            assert movie_resp.status_code == 201
+            movie_id = movie_resp.json()["id"]
+
+            # Add person to movie as Actor
+            add_person_resp = client.post(
+                f"{base_url}/movies/{movie_id}/persons",
+                json=[{"person_id": person_id, "role": "Actor"}],
+            )
+            assert add_person_resp.status_code == 201
+
+            # Get person's movies
+            response = client.get(f"{base_url}/persons/{person_id}/movies")
+
+        assert response.status_code == 200
+        movies = response.json()
+        assert len(movies) >= 1
+
+        # Find the movie we just added
+        movie_data = next((m for m in movies if m["movie_id"] == movie_id), None)
+        assert movie_data is not None
+
+        # Verify all required fields are present
+        assert "id" in movie_data  # movie_person id
+        assert movie_data["movie_id"] == movie_id
+        assert movie_data["movie_title"] == "Test Movie with Details"
+        assert movie_data["role"] == "Actor"
+
+        # Verify enhanced fields
+        assert "image_path" in movie_data
+        assert "rating" in movie_data
+        assert movie_data["rating"] == 8.5
+        assert "release_date" in movie_data
+        assert movie_data["release_date"] == "2024-01-15"
+        assert "genres" in movie_data
+        assert isinstance(movie_data["genres"], list)
+        assert set(movie_data["genres"]) == {1, 3}
+
+    def test_get_person_movies_with_multiple_roles(self, base_url: str) -> None:
+        """GET /persons/{id}/movies returns all movies grouped by role correctly."""
+        with httpx.Client(timeout=10.0) as client:
+            # Create a person
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "Multi Role Person", "email": _unique_email("multirole")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            # Create movies
+            movie1_resp = client.post(
+                f"{base_url}/movies",
+                json={"title": "As Actor Movie", "genres": [1], "rating": 7.0},
+            )
+            movie2_resp = client.post(
+                f"{base_url}/movies",
+                json={"title": "As Director Movie", "genres": [2], "rating": 8.0},
+            )
+            assert movie1_resp.status_code == 201
+            assert movie2_resp.status_code == 201
+            movie1_id = movie1_resp.json()["id"]
+            movie2_id = movie2_resp.json()["id"]
+
+            # Add person to movie 1 as Actor
+            client.post(
+                f"{base_url}/movies/{movie1_id}/persons",
+                json=[{"person_id": person_id, "role": "Actor"}],
+            )
+
+            # Add person to movie 2 as Director
+            client.post(
+                f"{base_url}/movies/{movie2_id}/persons",
+                json=[{"person_id": person_id, "role": "Director"}],
+            )
+
+            # Get person's movies
+            response = client.get(f"{base_url}/persons/{person_id}/movies")
+
+        assert response.status_code == 200
+        movies = response.json()
+        assert len(movies) == 2
+
+        # Find movies by role
+        actor_movies = [m for m in movies if m["role"] == "Actor"]
+        director_movies = [m for m in movies if m["role"] == "Director"]
+
+        assert len(actor_movies) == 1
+        assert len(director_movies) == 1
+
+        assert actor_movies[0]["movie_title"] == "As Actor Movie"
+        assert actor_movies[0]["rating"] == 7.0
+        assert director_movies[0]["movie_title"] == "As Director Movie"
+        assert director_movies[0]["rating"] == 8.0
+
+    def test_get_person_movies_not_found_returns_404(self, base_url: str) -> None:
+        """GET /persons/{id}/movies returns 404 when the person does not exist."""
+        with httpx.Client(timeout=10.0) as client:
+            response = client.get(f"{base_url}/persons/999999/movies")
+        assert response.status_code == 404
+
+    def test_get_person_movies_empty_list_when_no_movies(self, base_url: str) -> None:
+        """GET /persons/{id}/movies returns empty list when person has no movies."""
+        with httpx.Client(timeout=10.0) as client:
+            # Create a person without movies
+            person_resp = client.post(
+                f"{base_url}/persons",
+                json={"name": "No Movies Person", "email": _unique_email("nomovies")},
+            )
+            assert person_resp.status_code == 201
+            person_id = person_resp.json()["id"]
+
+            # Get person's movies
+            response = client.get(f"{base_url}/persons/{person_id}/movies")
+
+        assert response.status_code == 200
+        movies = response.json()
+        assert isinstance(movies, list)
+        assert len(movies) == 0

@@ -18,6 +18,7 @@ from app.db.models.movie_genre import MovieGenre
 from app.db.models.movie_person import MoviePerson
 from app.db.models.movies import Movie
 from app.db.models.person import Person
+from app.db.models.review import Review
 from app.db.models.role import MovieRole
 from app.db.session import SessionLocal
 
@@ -122,6 +123,21 @@ def run_seed(data_path: Path | None = None) -> bool:
     if not data_path.exists():
         return False
 
+    # Load ratings and reviews data
+    ratings_path = Path(__file__).resolve().parent / "ratings.json"
+    reviews_path = Path(__file__).resolve().parent / "reviews.json"
+
+    ratings_data = []
+    reviews_data = []
+
+    if ratings_path.exists():
+        with open(ratings_path, encoding="utf-8") as f:
+            ratings_data = json.load(f)
+
+    if reviews_path.exists():
+        with open(reviews_path, encoding="utf-8") as f:
+            reviews_data = json.load(f)
+
     # Get uploads directory from environment or default
     uploads_dir = Path(os.getenv("STORAGE_LOCAL_PATH", "./uploads"))
     uploads_dir.mkdir(parents=True, exist_ok=True)
@@ -153,7 +169,41 @@ def run_seed(data_path: Path | None = None) -> bool:
         if not rows:
             return False
 
-        for row in rows:
+        # List of reviewer names for seeding
+        reviewer_names = [
+            "Alex Johnson",
+            "Maria Garcia",
+            "David Chen",
+            "Sarah Williams",
+            "Michael Brown",
+            "Emily Davis",
+            "James Wilson",
+            "Jessica Martinez",
+            "Robert Anderson",
+            "Linda Taylor",
+            "Christopher Lee",
+            "Patricia White",
+            "Daniel Harris",
+            "Jennifer Clark",
+            "Matthew Lewis",
+            "Lisa Robinson",
+            "Andrew Walker",
+            "Karen Hall",
+            "Joshua Allen",
+            "Nancy Young",
+            "Ryan King",
+            "Betty Wright",
+            "Kevin Lopez",
+            "Sandra Hill",
+            "Brian Scott",
+            "Carol Green",
+            "Jason Adams",
+            "Laura Baker",
+            "Steven Nelson",
+            "Dorothy Carter",
+        ]
+
+        for idx, row in enumerate(rows):
             if not isinstance(row, dict):
                 continue
             title = (row.get("Title") or "").strip()
@@ -163,11 +213,20 @@ def run_seed(data_path: Path | None = None) -> bool:
             release_date = _parse_date(row.get("ReleaseDate"))
             # Randomly assign an image if available
             image_path = random.choice(available_images) if available_images else None
+
+            # Get rating from ratings.json if available
+            movie_rating = None
+            if idx < len(ratings_data) and isinstance(ratings_data[idx], dict):
+                rating_value = ratings_data[idx].get("Rating")
+                if rating_value is not None:
+                    movie_rating = float(rating_value)
+
             movie = Movie(
                 title=title,
                 description=(row.get("Description") or "").strip() or None,
                 release_date=release_date,
                 image_path=image_path,
+                rating=movie_rating,
             )
             db.add(movie)
             db.flush()
@@ -191,6 +250,27 @@ def run_seed(data_path: Path | None = None) -> bool:
             if producer_name:
                 person = _get_or_create_person(db, producer_name)
                 db.add(MoviePerson(movie_id=movie.id, person_id=person.id, role=MovieRole.Producer))
+
+            # Add reviews for this movie (2-5 random reviews)
+            if reviews_data:
+                num_reviews = random.randint(2, 5)
+                selected_reviews = random.sample(reviews_data, min(num_reviews, len(reviews_data)))
+
+                for review_text in selected_reviews:
+                    if not review_text or not isinstance(review_text, str):
+                        continue
+
+                    # Random rating between 5.0 and 10.0 for each review
+                    review_rating = round(random.uniform(5.0, 10.0), 1)
+                    reviewer_name = random.choice(reviewer_names)
+
+                    review = Review(
+                        movie_id=movie.id,
+                        author_name=reviewer_name,
+                        rating=review_rating,
+                        content=review_text.strip(),
+                    )
+                    db.add(review)
 
         db.commit()
         return True

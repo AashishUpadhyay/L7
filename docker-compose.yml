@@ -33,10 +33,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=imdb_db
 
-  admin-panel:
-    container_name: admin-panel
+  ui:
+    container_name: ui
     build:
-      context: ./admin-panel
+      context: ./ui
       dockerfile: Dockerfile
       args:
         - VITE_API_BASE_URL=http://localhost:9000

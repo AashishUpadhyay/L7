@@ -11,13 +11,13 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 # PRIMARY BUILD COMMANDS
 # ============================================================================
 
-# Frontend (admin-panel)
+# Frontend (ui)
 build-frontend: test-ui
-	docker compose build admin-panel
+	docker compose build ui
 
 buildup-frontend:
-	docker compose build admin-panel
-	docker compose up -d admin-panel
+	docker compose build ui
+	docker compose up -d ui
 
 # Backend (API + DB)
 build-backend: lint
@@ -58,7 +58,7 @@ lint-fix:
 
 # Run frontend UI tests (Vitest)
 test-ui:
-	cd admin-panel && npm ci && npm run test:run
+	cd ui && npm ci && npm run test:run
 
 # Run integration tests locally (requires backend running)
 test:

@@ -8,7 +8,7 @@ ENV PATH="/root/.local/bin/:$PATH"
 
 WORKDIR /app
 
-# Only what’s needed to install deps and run tests (no admin-panel, docs, etc.)
+# Only what’s needed to install deps and run tests (no ui, docs, etc.)
 # README.md is required: pyproject.toml has readme = "README.md" and hatchling needs it to build the package.
 COPY pyproject.toml uv.lock README.md ./
 COPY app ./app

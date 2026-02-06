@@ -45,9 +45,9 @@ uploads/
 # Cursor
 .cursor/
 
-# Node / admin-panel
+# Node / ui
 node_modules/
-admin-panel/dist/
+ui/dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
