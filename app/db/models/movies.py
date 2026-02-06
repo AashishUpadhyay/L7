@@ -22,6 +22,7 @@ class Movie(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     release_date: Mapped[dt.date | None] = mapped_column(Date, nullable=True)
     rating: Mapped[float | None] = mapped_column(Float, nullable=True)
+    image_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

@@ -20,9 +20,9 @@ vi.mock('react-router-dom', async (importOriginal) => {
 
 function renderWithRouter(id: string) {
   return render(
-    <MemoryRouter initialEntries={[`/actor/${id}`]}>
+    <MemoryRouter initialEntries={[`/professionals/${id}`]}>
       <Routes>
-        <Route path="/actor/:id" element={<ActorDetailPage />} />
+        <Route path="/professionals/:id" element={<ActorDetailPage />} />
       </Routes>
     </MemoryRouter>
   )
@@ -46,7 +46,7 @@ describe('ActorDetailPage', () => {
     renderWithRouter('1')
     expect(screen.getByText('Loading…')).toBeInTheDocument()
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /Actor #1/ })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /Professional #1/ })).toBeInTheDocument()
     })
     expect(screen.getByText('jane@example.com')).toBeInTheDocument()
     expect(screen.getByText('Name')).toBeInTheDocument()
@@ -57,10 +57,10 @@ describe('ActorDetailPage', () => {
   it('renders breadcrumbs with Home, Actor, and name', async () => {
     renderWithRouter('1')
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /Actor #1/ })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /Professional #1/ })).toBeInTheDocument()
     })
     expect(screen.getByRole('link', { name: /Home/i })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('link', { name: 'Actor' })).toHaveAttribute('href', '/actor')
+    expect(screen.getByRole('link', { name: 'Professionals' })).toHaveAttribute('href', '/professionals')
     expect(screen.getByRole('navigation')).toHaveTextContent('Jane Doe')
   })
 
@@ -75,7 +75,7 @@ describe('ActorDetailPage', () => {
   it('opens edit modal when Edit is clicked', async () => {
     renderWithRouter('1')
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /Actor #1/ })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /Professional #1/ })).toBeInTheDocument()
     })
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
     await waitFor(() => {
@@ -86,11 +86,11 @@ describe('ActorDetailPage', () => {
   it('opens delete confirm modal when Delete is clicked', async () => {
     renderWithRouter('1')
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /Actor #1/ })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /Professional #1/ })).toBeInTheDocument()
     })
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Delete actor?' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Delete professional?' })).toBeInTheDocument()
       expect(screen.getByText(/Delete Jane Doe\?/)).toBeInTheDocument()
     })
   })
@@ -103,13 +103,13 @@ describe('ActorDetailPage', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Delete actor?' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Delete professional?' })).toBeInTheDocument()
     })
     const buttons = screen.getAllByRole('button', { name: 'Delete' })
     fireEvent.click(buttons[buttons.length - 1])
     await waitFor(() => {
       expect(personsApi.deletePerson).toHaveBeenCalledWith(1)
-      expect(mockNavigate).toHaveBeenCalledWith('/actor')
+      expect(mockNavigate).toHaveBeenCalledWith('/professionals')
     })
   })
 })

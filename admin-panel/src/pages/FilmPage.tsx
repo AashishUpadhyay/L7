@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { listMovies, searchMovies, deleteMovie } from '@/api/movies'
+import { listMovies, searchMovies, deleteMovie, getMoviePersons } from '@/api/movies'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
+import { getImageUrl } from '@/utils/imageUrl'
 import { GENRES } from '@/types/movie'
 import type { Movie } from '@/types/movie'
+import type { PersonInMovie } from '@/types/moviePerson'
 import { FilmFormModal } from '@/components/film/FilmFormModal'
 import { DeleteConfirmModal } from '@/components/common/DeleteConfirmModal'
 
@@ -33,6 +35,11 @@ export function FilmPage() {
   const [formMovie, setFormMovie] = useState<Movie | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Movie | null>(null)
   const [error, setError] = useState<string | null>(null)
+  
+  // Expandable rows state
+  const [expandedMovies, setExpandedMovies] = useState<Set<number>>(new Set())
+  const [moviePersons, setMoviePersons] = useState<Record<number, PersonInMovie[]>>({})
+  const [loadingPersons, setLoadingPersons] = useState<Set<number>>(new Set())
 
   const fetchList = useCallback(async () => {
     setLoading(true)
@@ -44,6 +51,21 @@ export function FilmPage() {
         : await listMovies(skip, limit)
       setItems(res.items)
       setTotal(res.total)
+      
+      // Refresh person data for any currently expanded movies
+      const expandedIds = Array.from(expandedMovies)
+      if (expandedIds.length > 0) {
+        const updatedPersons: Record<number, PersonInMovie[]> = {}
+        for (const movieId of expandedIds) {
+          try {
+            const persons = await getMoviePersons(movieId)
+            updatedPersons[movieId] = persons
+          } catch (e) {
+            console.error(`Failed to refresh persons for movie ${movieId}:`, e)
+          }
+        }
+        setMoviePersons(updatedPersons)
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load')
       setItems([])
@@ -51,7 +73,7 @@ export function FilmPage() {
     } finally {
       setLoading(false)
     }
-  }, [skip, limit, debouncedSearchTitle])
+  }, [skip, limit, debouncedSearchTitle, expandedMovies])
 
   useEffect(() => {
     fetchList()
@@ -64,6 +86,30 @@ export function FilmPage() {
       fetchList()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Delete failed')
+    }
+  }
+
+  const toggleExpanded = async (movieId: number) => {
+    const newExpanded = new Set(expandedMovies)
+    if (newExpanded.has(movieId)) {
+      newExpanded.delete(movieId)
+      setExpandedMovies(newExpanded)
+    } else {
+      newExpanded.add(movieId)
+      setExpandedMovies(newExpanded)
+      
+      // Always load persons (refresh on every expand)
+      setLoadingPersons(new Set(loadingPersons).add(movieId))
+      try {
+        const persons = await getMoviePersons(movieId)
+        setMoviePersons({ ...moviePersons, [movieId]: persons })
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load persons')
+      } finally {
+        const newLoadingPersons = new Set(loadingPersons)
+        newLoadingPersons.delete(movieId)
+        setLoadingPersons(newLoadingPersons)
+      }
     }
   }
 
@@ -91,6 +137,7 @@ export function FilmPage() {
               release_date: null,
               genres: [],
               rating: null,
+              image_path: null,
               created_at: '',
               updated_at: '',
             })
@@ -138,7 +185,9 @@ export function FilmPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-700 text-white">
+              <th className="px-4 py-3 text-left font-medium w-12"></th>
               <th className="px-4 py-3 text-left font-medium">Action</th>
+              <th className="px-4 py-3 text-left font-medium w-20">Image</th>
               <th className="px-4 py-3 text-left font-medium">Title</th>
               <th className="px-4 py-3 text-left font-medium">Description</th>
               <th className="px-4 py-3 text-left font-medium">Release date</th>
@@ -147,34 +196,114 @@ export function FilmPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
+              <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-500">Loading…</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
+              <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-500">No results</td></tr>
             ) : (
-              items.map((movie, i) => (
-                <tr
-                  key={movie.id}
-                  className={`border-t border-gray-100 hover:bg-gray-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Link to={`/film/${movie.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                      </Link>
-                      <button type="button" onClick={() => setFormMovie(movie)} className="p-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors inline-flex items-center justify-center" title="Edit" aria-label="Edit">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                      </button>
-                      <button type="button" onClick={() => setDeleteTarget(movie)} className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors inline-flex items-center justify-center" title="Delete" aria-label="Delete">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 font-medium">{movie.title}</td>
-                  <td className="px-4 py-3 max-w-[200px] truncate text-gray-600" title={movie.description ?? ''}>{movie.description ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{formatDate(movie.release_date)}</td>
-                  <td className="px-4 py-3 text-gray-600">{genreLabels(movie.genres)}</td>
-                </tr>
-              ))
+              items.map((movie, i) => {
+                const isExpanded = expandedMovies.has(movie.id)
+                const persons = moviePersons[movie.id] || []
+                const isLoadingPersons = loadingPersons.has(movie.id)
+                
+                return (
+                  <React.Fragment key={movie.id}>
+                    <tr
+                      key={movie.id}
+                      className={`border-t border-gray-100 hover:bg-gray-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                    >
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpanded(movie.id)}
+                          className="p-1 hover:bg-gray-200 rounded transition-colors"
+                          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                        >
+                          <svg
+                            className={`w-5 h-5 text-gray-600 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Link to={`/film/${movie.id}`} className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center" title="View" aria-label="View">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                          </Link>
+                          <button type="button" onClick={() => setFormMovie(movie)} className="p-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors inline-flex items-center justify-center" title="Edit" aria-label="Edit">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                          </button>
+                          <button type="button" onClick={() => setDeleteTarget(movie)} className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors inline-flex items-center justify-center" title="Delete" aria-label="Delete">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {movie.image_path ? (
+                          <div className="relative group">
+                            <img
+                              src={getImageUrl(movie.image_path) || ''}
+                              alt={movie.title}
+                              className="w-12 h-16 object-cover rounded border border-gray-200 shadow-sm cursor-pointer transition-transform hover:scale-110"
+                            />
+                            <div className="absolute left-0 top-0 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 pointer-events-none">
+                              <img
+                                src={getImageUrl(movie.image_path) || ''}
+                                alt={movie.title}
+                                className="max-w-md max-h-96 rounded-lg border-4 border-white shadow-2xl ml-16 ring-2 ring-gray-300"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-12 h-16 flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-gray-400 text-xs">
+                            No image
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 font-medium">{movie.title}</td>
+                      <td className="px-4 py-3 max-w-[200px] truncate text-gray-600" title={movie.description ?? ''}>{movie.description ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatDate(movie.release_date)}</td>
+                      <td className="px-4 py-3 text-gray-600">{genreLabels(movie.genres)}</td>
+                    </tr>
+                    {isExpanded && (
+                      <tr key={`${movie.id}-expanded`} className="bg-blue-50/30">
+                        <td colSpan={7} className="px-4 py-3">
+                          {isLoadingPersons ? (
+                            <p className="text-sm text-gray-500 italic">Loading people...</p>
+                          ) : persons.length === 0 ? (
+                            <p className="text-sm text-gray-500 italic">No people assigned to this movie.</p>
+                          ) : (
+                            <div className="pl-8">
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">People in this movie:</h4>
+                              <div className="space-y-1">
+                                {persons.map((person) => (
+                                  <div
+                                    key={`${person.person_id}-${person.role}`}
+                                    className="flex items-center gap-3 text-sm bg-white px-3 py-2 rounded border border-gray-200"
+                                  >
+                                    <span className="font-medium text-gray-800">{person.person_name}</span>
+                                    <span className="text-gray-500">•</span>
+                                    <span className="text-gray-600">{person.role}</span>
+                                    <Link
+                                      to={`/professionals/${person.person_id}`}
+                                      className="ml-auto text-blue-600 hover:text-blue-800 text-xs"
+                                    >
+                                      View Profile →
+                                    </Link>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                )
+              })
             )}
           </tbody>
         </table>

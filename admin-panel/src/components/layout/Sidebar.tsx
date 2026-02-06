@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
 
 const nav = [
+  { label: 'Dashboard', to: '/', icon: '📊' },
   { label: 'Film', to: '/film', icon: '🎬' },
-  { label: 'Actor', to: '/actor', icon: '🎥' },
+  { label: 'Professionals', to: '/professionals', icon: '🎥' },
 ]
 
 export function Sidebar() {
@@ -12,7 +13,10 @@ export function Sidebar() {
     <aside className="w-56 h-full flex-shrink-0 bg-sidebar-bg text-sidebar-text flex flex-col overflow-auto border-r border-sidebar-hover/80">
       <nav className="flex-1 py-5 px-3">
         {nav.map(({ to, label, icon }) => {
-          const isActive = location.pathname === to || location.pathname.startsWith(to + '/')
+          const isActive =
+            to === '/'
+              ? location.pathname === to
+              : location.pathname === to || location.pathname.startsWith(to + '/')
           return (
             <Link
               key={to}

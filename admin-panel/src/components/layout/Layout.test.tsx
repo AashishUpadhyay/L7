@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { Layout } from './Layout'
@@ -19,8 +19,9 @@ describe('Layout', () => {
   it('renders header and sidebar', () => {
     renderLayout()
     expect(screen.getByRole('heading', { name: 'Admin Console' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Dashboard/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Film/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Actor/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Professional/i })).toBeInTheDocument()
   })
 
   it('renders outlet content', () => {
