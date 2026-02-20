@@ -8,3 +8,21 @@ architecture for the system
 
 3) any questions or concerns you have regarding this dataset/system that might need to be answered before establishing an ideal database/solution for such a system.
 
+- A database of different products ordered by customers and the prices, supplier, cost, warehouse location, available qty and min qty
+
+- product (widget name, cost, available qty, min qty)
+- widget type (Ant Trap, Mouse Trap ...)
+- customers (Home Place, Bug Store etc)
+- Orders (customer id, packaging information, price)
+- warehouse (ATL, MSP, AUS...)
+- suppliers
+
+- Observations
+    - Customers are priced differently for different orders, its not clear how. May be its date dependant. So we dont know the unit price for orderdetails
+        -  bag of 10 Ant Traps costs 9$ to Home Place
+        -  bag of 5 Ant Traps costs 5$ to Home Place
+        -  bag of 10 Ant Traps costs 10$ to Bug Store
+        -  bag of 5 Ant Traps costs 6$ to Bug Store
+    - What does min_qty means?
+    - Different suppliers may charge differently so we have inventory and inventory detail tables. Inventory detail table contains the cost price and if the order contains product from different inventory-details we charge differently
+

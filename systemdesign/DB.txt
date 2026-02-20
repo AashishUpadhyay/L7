@@ -1,0 +1,56 @@
+- products
+    - product_id
+    - product_name
+
+- inventory
+    - inventory_id
+    - product_id
+    - min_qty
+    - warehouse_id
+
+- inventorydetail
+    - inventorydetail_id
+    - inventory_id
+    - qty
+    - supplier_id
+    - cost
+    - received_date
+
+- inventoryorders
+    - inventorydetail_id
+    - orderdetail_id
+    - units
+
+- warehouse
+    - warehouse_id
+    - location
+
+- suppliers
+    - supplier_id
+    - supplier_name
+
+- customers
+    - customer_id
+    - customer_name
+
+- orders
+    - order_id
+    - customer_id
+    - order_date 
+
+- orderdetails
+    - orderdetail_id
+    - order_id
+    - product_id
+    - packaging_type
+    - pack_count
+    - units             -- e.g., 10
+    - unit_price        -- price per pack OR per unit (define clearly)
+    - taxes
+    - discount
+
+- pricingpolicy
+    - product_id
+    - start_date
+    - end_date
+    - unit_price
