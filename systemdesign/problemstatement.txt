@@ -26,3 +26,22 @@ architecture for the system
     - What does min_qty means?
     - Different suppliers may charge differently so we have inventory and inventory detail tables. Inventory detail table contains the cost price and if the order contains product from different inventory-details we charge differently
 
+- APIS:
+    - Admin:
+        - Customers (CRUD + Search)
+        - Products (CRUD + Search)
+        - Inventory (CRUD + Search)
+        - PricingPolicy (CRUD + Search)
+    - Customer APIS
+        - Orders
+- Business Layer:
+    - Inventory never becoming negative
+    - Concurrency Issues (Transaction and Atomicity)
+- Asynchronous Processing:
+    - Celery + Rabbit MQ
+    - Payment Processing:
+        - Payment Succeeded
+        - Payment Failed (Restore Inventory)
+        - Transaction Cancelled (Restore Inventory)
+
+            
