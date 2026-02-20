@@ -558,25 +558,199 @@ class TestMoviesApi:
         assert f"Drama Only {unique}" in titles
         assert f"Comedy Only {unique}" not in titles
 
-    def test_search_movies_by_release_year_returns_filtered_list(self, base_url: str) -> None:
-        """POST /movies/search with release_year filters and returns paged results."""
+    def test_search_movies_by_start_year_returns_movies_from_year_onwards(
+        self, base_url: str
+    ) -> None:
+        """POST /movies/search with start_year returns movies from that year onwards."""
+        unique = uuid.uuid4().hex[:8]
         with httpx.Client(timeout=10.0) as client:
             client.post(
                 f"{base_url}/movies",
-                json={"title": "Year 2020", "genres": [1], "release_date": "2020-06-15"},
+                json={
+                    "title": f"Year 2018 {unique}",
+                    "genres": [1],
+                    "release_date": "2018-03-15",
+                },
             )
             client.post(
                 f"{base_url}/movies",
-                json={"title": "Year 2021", "genres": [2], "release_date": "2021-01-01"},
+                json={
+                    "title": f"Year 2020 {unique}",
+                    "genres": [2],
+                    "release_date": "2020-06-15",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2022 {unique}",
+                    "genres": [3],
+                    "release_date": "2022-01-01",
+                },
             )
             response = client.post(
                 f"{base_url}/movies/search",
-                json={"release_year": 2020, "skip": 0, "limit": 10},
+                json={"start_year": 2020, "title": unique, "skip": 0, "limit": 10},
             )
         assert response.status_code == 200
         data = response.json()
-        assert all((item.get("release_date") or "").startswith("2020") for item in data["items"])
-        assert data["total"] >= 1
+        assert data["total"] >= 2
+        titles = [m["title"] for m in data["items"]]
+        assert f"Year 2020 {unique}" in titles
+        assert f"Year 2022 {unique}" in titles
+        assert f"Year 2018 {unique}" not in titles
+
+    def test_search_movies_by_end_year_returns_movies_up_to_year(self, base_url: str) -> None:
+        """POST /movies/search with end_year returns movies up to and including that year."""
+        unique = uuid.uuid4().hex[:8]
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2018 {unique}",
+                    "genres": [1],
+                    "release_date": "2018-03-15",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2020 {unique}",
+                    "genres": [2],
+                    "release_date": "2020-06-15",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2022 {unique}",
+                    "genres": [3],
+                    "release_date": "2022-01-01",
+                },
+            )
+            response = client.post(
+                f"{base_url}/movies/search",
+                json={"end_year": 2020, "title": unique, "skip": 0, "limit": 10},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] >= 2
+        titles = [m["title"] for m in data["items"]]
+        assert f"Year 2018 {unique}" in titles
+        assert f"Year 2020 {unique}" in titles
+        assert f"Year 2022 {unique}" not in titles
+
+    def test_search_movies_by_year_range_returns_movies_within_range(self, base_url: str) -> None:
+        """POST /movies/search with start_year and end_year returns movies within range (inclusive)."""
+        unique = uuid.uuid4().hex[:8]
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2015 {unique}",
+                    "genres": [1],
+                    "release_date": "2015-03-15",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2018 {unique}",
+                    "genres": [2],
+                    "release_date": "2018-06-15",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2020 {unique}",
+                    "genres": [3],
+                    "release_date": "2020-01-01",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2023 {unique}",
+                    "genres": [4],
+                    "release_date": "2023-12-31",
+                },
+            )
+            response = client.post(
+                f"{base_url}/movies/search",
+                json={
+                    "start_year": 2018,
+                    "end_year": 2020,
+                    "title": unique,
+                    "skip": 0,
+                    "limit": 10,
+                },
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] >= 2
+        titles = [m["title"] for m in data["items"]]
+        assert f"Year 2018 {unique}" in titles
+        assert f"Year 2020 {unique}" in titles
+        assert f"Year 2015 {unique}" not in titles
+        assert f"Year 2023 {unique}" not in titles
+
+    def test_search_movies_by_single_year_range_returns_movies_from_that_year(
+        self, base_url: str
+    ) -> None:
+        """POST /movies/search with start_year == end_year returns movies from that year only."""
+        unique = uuid.uuid4().hex[:8]
+        with httpx.Client(timeout=10.0) as client:
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2019 {unique}",
+                    "genres": [1],
+                    "release_date": "2019-05-20",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2020 A {unique}",
+                    "genres": [2],
+                    "release_date": "2020-01-15",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2020 B {unique}",
+                    "genres": [3],
+                    "release_date": "2020-12-25",
+                },
+            )
+            client.post(
+                f"{base_url}/movies",
+                json={
+                    "title": f"Year 2021 {unique}",
+                    "genres": [4],
+                    "release_date": "2021-02-10",
+                },
+            )
+            response = client.post(
+                f"{base_url}/movies/search",
+                json={
+                    "start_year": 2020,
+                    "end_year": 2020,
+                    "title": unique,
+                    "skip": 0,
+                    "limit": 10,
+                },
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] >= 2
+        titles = [m["title"] for m in data["items"]]
+        assert f"Year 2020 A {unique}" in titles
+        assert f"Year 2020 B {unique}" in titles
+        assert f"Year 2019 {unique}" not in titles
+        assert f"Year 2021 {unique}" not in titles
 
     def test_search_movies_by_director_returns_filtered_list(self, base_url: str) -> None:
         """POST /movies/search with director_id returns movies directed by that person."""

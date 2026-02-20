@@ -87,7 +87,8 @@ class MovieSearchRequest(BaseModel):
     title: str | None = None  # Substring match on title (case-insensitive)
     genres: list[Genre] | None = None  # OR: movies that have any of these genres
     director_id: int | None = None
-    release_year: int | None = Field(None, ge=1800, le=2100)
+    start_year: int | None = Field(None, ge=1800, le=2100)  # Minimum release year (inclusive)
+    end_year: int | None = Field(None, ge=1800, le=2100)  # Maximum release year (inclusive)
     actor_ids: list[int] | None = None  # OR: movies that feature any of these actors
     skip: int = Field(0, ge=0, description="Number of records to skip (for paging).")
     limit: int = Field(20, ge=1, le=100, description="Maximum number of records to return (1–100).")

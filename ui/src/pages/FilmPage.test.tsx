@@ -159,6 +159,62 @@ describe('FilmPage', () => {
     )
   })
 
+  it('calls searchMovies with start_year when "From" year is entered', async () => {
+    vi.mocked(moviesApi.searchMovies).mockResolvedValue(mockMovies)
+    renderPage()
+    await waitFor(() => {
+      expect(moviesApi.listMovies).toHaveBeenCalled()
+    })
+    const fromYearInput = screen.getByPlaceholderText('From')
+    fireEvent.change(fromYearInput, { target: { value: '2020' } })
+    await waitFor(
+      () => {
+        expect(moviesApi.searchMovies).toHaveBeenCalledWith(
+          expect.objectContaining({ start_year: 2020 })
+        )
+      },
+      { timeout: 1000 }
+    )
+  })
+
+  it('calls searchMovies with end_year when "To" year is entered', async () => {
+    vi.mocked(moviesApi.searchMovies).mockResolvedValue(mockMovies)
+    renderPage()
+    await waitFor(() => {
+      expect(moviesApi.listMovies).toHaveBeenCalled()
+    })
+    const toYearInput = screen.getByPlaceholderText('To')
+    fireEvent.change(toYearInput, { target: { value: '2023' } })
+    await waitFor(
+      () => {
+        expect(moviesApi.searchMovies).toHaveBeenCalledWith(
+          expect.objectContaining({ end_year: 2023 })
+        )
+      },
+      { timeout: 1000 }
+    )
+  })
+
+  it('calls searchMovies with both start_year and end_year for range filter', async () => {
+    vi.mocked(moviesApi.searchMovies).mockResolvedValue(mockMovies)
+    renderPage()
+    await waitFor(() => {
+      expect(moviesApi.listMovies).toHaveBeenCalled()
+    })
+    const fromYearInput = screen.getByPlaceholderText('From')
+    const toYearInput = screen.getByPlaceholderText('To')
+    fireEvent.change(fromYearInput, { target: { value: '2020' } })
+    fireEvent.change(toYearInput, { target: { value: '2023' } })
+    await waitFor(
+      () => {
+        expect(moviesApi.searchMovies).toHaveBeenCalledWith(
+          expect.objectContaining({ start_year: 2020, end_year: 2023 })
+        )
+      },
+      { timeout: 1000 }
+    )
+  })
+
   describe('expandable rows (people in movie)', () => {
     it('has expand button for each movie row', async () => {
       renderPage()

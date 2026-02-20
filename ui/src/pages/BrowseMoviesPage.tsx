@@ -224,7 +224,8 @@ export function BrowseMoviesPage() {
             title: trimmedSearch || undefined,
             genres: selectedGenres.length > 0 ? selectedGenres : undefined,
             actor_ids: selectedActorIds.length > 0 ? selectedActorIds : undefined,
-            release_year: selectedYear || undefined,
+            start_year: selectedYear || undefined,
+            end_year: selectedYear || undefined,
             skip,
             limit,
           })

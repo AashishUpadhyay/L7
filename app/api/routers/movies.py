@@ -70,7 +70,7 @@ def list_movies(
     "/search",
     response_model=MovieListResponse,
     summary="Search movies",
-    description="Search movies by genres (OR), director, release year, or actor_ids (OR). Request body supports optional filters and paging (skip, limit).",
+    description="Search movies by genres (OR), director, release year range (start_year to end_year, inclusive), or actor_ids (OR). Request body supports optional filters and paging (skip, limit).",
     responses={
         200: {"description": "Paginated search results returned successfully."},
     },
@@ -90,8 +90,10 @@ def search_movies(
             .where(MovieGenre.genre.in_(payload.genres))
             .distinct()
         )
-    if payload.release_year is not None:
-        base = base.where(func.extract("year", Movie.release_date) == payload.release_year)
+    if payload.start_year is not None:
+        base = base.where(func.extract("year", Movie.release_date) >= payload.start_year)
+    if payload.end_year is not None:
+        base = base.where(func.extract("year", Movie.release_date) <= payload.end_year)
     if payload.director_id is not None:
         director_exists = exists().where(
             MoviePerson.movie_id == Movie.id,

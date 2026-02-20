@@ -34,6 +34,8 @@ export function FilmPage() {
   const debouncedSearchTitle = useDebouncedValue(searchTitle, 400, () => setSkip(0))
   const [selectedGenres, setSelectedGenres] = useState<number[]>([])
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false)
+  const [startYear, setStartYear] = useState<string>('')
+  const [endYear, setEndYear] = useState<string>('')
   const [formMovie, setFormMovie] = useState<Movie | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Movie | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -48,11 +50,15 @@ export function FilmPage() {
     setError(null)
     try {
       const trimmed = debouncedSearchTitle.trim()
-      const hasFilters = trimmed || selectedGenres.length > 0
+      const startYearNum = startYear ? parseInt(startYear, 10) : undefined
+      const endYearNum = endYear ? parseInt(endYear, 10) : undefined
+      const hasFilters = trimmed || selectedGenres.length > 0 || startYearNum !== undefined || endYearNum !== undefined
       const res = hasFilters
         ? await searchMovies({ 
             title: trimmed || undefined, 
             genres: selectedGenres.length > 0 ? selectedGenres : undefined,
+            start_year: startYearNum,
+            end_year: endYearNum,
             skip, 
             limit 
           })
@@ -81,7 +87,7 @@ export function FilmPage() {
     } finally {
       setLoading(false)
     }
-  }, [skip, limit, debouncedSearchTitle, selectedGenres, expandedMovies])
+  }, [skip, limit, debouncedSearchTitle, selectedGenres, startYear, endYear, expandedMovies])
 
   useEffect(() => {
     fetchList()
@@ -241,6 +247,30 @@ export function FilmPage() {
           )}
         </div>
 
+        {/* Year Range Filter */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500 whitespace-nowrap">Year</span>
+          <input
+            type="number"
+            placeholder="From"
+            value={startYear}
+            onChange={(e) => { setStartYear(e.target.value); setSkip(0) }}
+            min="1800"
+            max="2100"
+            className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+          />
+          <span className="text-sm text-gray-400">-</span>
+          <input
+            type="number"
+            placeholder="To"
+            value={endYear}
+            onChange={(e) => { setEndYear(e.target.value); setSkip(0) }}
+            min="1800"
+            max="2100"
+            className="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+          />
+        </div>
+
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Results</span>
           <select
@@ -254,7 +284,7 @@ export function FilmPage() {
       </div>
 
       {/* Active Filters */}
-      {selectedGenres.length > 0 && (
+      {(selectedGenres.length > 0 || startYear || endYear) && (
         <div className="mb-5 flex flex-wrap items-center gap-2">
           <span className="text-sm text-gray-600 font-medium">Active Filters:</span>
           {selectedGenres.map(genreValue => {
@@ -278,9 +308,24 @@ export function FilmPage() {
               </span>
             ) : null
           })}
+          {(startYear || endYear) && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-800 rounded-full text-sm">
+              Year: {startYear || '...'} - {endYear || '...'}
+              <button
+                type="button"
+                onClick={() => { setStartYear(''); setEndYear(''); setSkip(0) }}
+                className="hover:bg-purple-200 rounded-full p-0.5 transition-colors"
+                aria-label="Remove year range filter"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
           <button
             type="button"
-            onClick={clearGenreFilter}
+            onClick={() => { clearGenreFilter(); setStartYear(''); setEndYear(''); setSkip(0) }}
             className="text-sm text-gray-600 hover:text-gray-800 underline ml-2"
           >
             Clear all filters
